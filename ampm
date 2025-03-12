@@ -1,0 +1,48 @@
+#!/bin/bash
+
+source ./ampm.sh
+
+mkdir -p /etc/ngatngay
+
+MENU_OPTIONS=(
+    "cai dat|src/install.sh"
+    "danh sach domain|./src/domain_list.sh"
+    "danh sach php|./src/php_list.sh"
+    "them domain|./src/domain_create.sh"
+    "thong tin|./src/info.sh"
+)
+
+
+echo "Apache - MariaDB - PHP Manager"
+echo "----------"
+
+for i in "${!MENU_OPTIONS[@]}"; do
+    IFS="|" read -r name _ <<< "${MENU_OPTIONS[i]}"
+    echo "$((i + 1)). $name"
+done
+
+# Nhập lựa chọn
+if [[ -n $1 ]]; then
+    choice=$1
+else
+    read -rp "Nhập lựa chọn của bạn: " choice
+fi
+
+# Kiểm tra lựa chọn có hợp lệ không
+if ! [[ $choice =~ ^[0-9]+$ ]]; then
+    echo "Lựa chọn không hợp lệ, vui lòng nhập số."
+    exit 1
+fi
+
+choice=$((choice - 1))
+
+# Xử lý lựa chọn
+if [[ $choice -ge 0 && $choice -lt ${#MENU_OPTIONS[@]} ]]; then
+    clear
+
+    IFS="|" read -r _ action <<< "${MENU_OPTIONS[choice]}"
+    source $action
+else
+    echo "Lựa chọn không hợp lệ, vui lòng chọn lại."
+    exit 1
+fi

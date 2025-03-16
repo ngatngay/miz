@@ -34,7 +34,7 @@ php_list() {
     fi
 }
 
-install_php() {
+php_install() {
     local version="$1"
 
     if [[ -z "$version" ]]; then

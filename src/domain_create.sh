@@ -42,14 +42,13 @@ domain_config_dir=/etc/ngatngay/domain/$domain
 mkdir -p $domain_config_dir
 
 # tpl
-if [ "$php_version" != "0" ]; then
+
 tpl_php=$(cat <<EOT
 <FilesMatch "\.php$">
-    SetHandler "proxy:unix:/run/php/php${php_version}-fpm-${domain}.sock|fcgi://localhost"
+    SetHandler "proxy:unix:/run/php/php-fpm-${domain}.sock|fcgi://localhost"
 </FilesMatch>
 EOT
 )
-fi
 
 export tpl_domain=$domain
 export tpl_domains=$domains
@@ -59,7 +58,6 @@ export tpl_php=$tpl_php
 
 declare -px | grep '^declare -x tpl_' > $domain_config_dir/config.sh
 
-envsubst < ${ROOT_PATH}/tpl/apache_vhost.conf > $domain_config_dir/apache.conf
-envsubst < ${ROOT_PATH}/tpl/php-fpm.conf > $domain_config_dir/php-fpm.conf
-
 echo "created: $domain"
+echo "---"
+echo "please run update"

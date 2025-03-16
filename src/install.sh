@@ -1,18 +1,20 @@
 #!/bin/bash
 
+phps=("7.4" "8.3")
+
 if installed; then
     echo "---"
     echo "script installed, only update"
     echo "---"
 fi
 
-#apt update
-#apt upgrade
+apt update
+apt upgrade
 
-# apt install neovim git fish rclone restic
+apt install neovim git fish rclone restic
 
 # init
-# restic self-update
+restic self-update
 
 # mariadb
 if ! installed; then
@@ -38,60 +40,34 @@ EOF
 fi
 
 # php
-php_conf=$(cat << 'EOF'
-open_basedir =
-
-disable_functions =
-disable_classes =
-
-max_execution_time = 300
-max_input_time = 600
-max_input_vars = 1000000
-
-memory_limit = 256M
-
-error_reporting = E_ALL
-display_errors = On
-log_errors = On
-error_log = error_log
-
-post_max_size = 4096M
-upload_max_filesize = 4096M
-max_file_uploads = 200
-
-date.timezone = "Asia/Ho_Chi_Minh"
-
-apnable_cli=On
-EOF
-)
+if ! installed; then
+    for i in "${phps[@]}"; do
+        install_php $i
+    done
+fi
 
 for f in $(list_php); do
-    echo "$php_conf" > /etc/php/${f}/cli/conf.d/99-ngatngay.ini
-    echo "$php_conf" > /etc/php/${f}/fpm/conf.d/99-ngatngay.ini
+    cp $ROOT_PATH/tpl/php.ini /etc/php/${f}/cli/conf.d/99-ngatngay.ini
+    cp $ROOT_PATH/tpl/php.ini /etc/php/${f}/fpm/conf.d/99-ngatngay.ini
     
     systemctl restart php${f}-fpm.service
 done
 
-
 # apahce
-echo "MDCertificateAgreement accepted
-MDContactEmail ssl@gmail.com
-MDStoreDir /var/www/apache-ssl
-MDChallengeDns01 /var/www/bin/acme-apache
-MDRequireHttps permanent
-MDMembers manual
-MDMatchNames servernames
+if ! installed; then
+fi
 
-LimitRequestFieldSize 65536
-LimitRequestLine 65536
+# Bật module cần thiết
+a2enmod md ssl headers rewrite proxy proxy_hcheck proxy_balancer proxy_fcgi proxy_http proxy_wstunnel
 
-<Directory /srv>
-    Options FollowSymLinks
-    AllowOverride All
-    Require all granted
-</Directory>" > /etc/apache2/conf-available/ngatngay.conf
+# cau hinh
+cp $ROOT_PATH/tpl/apache.conf /etc/apache2/conf-available/ngatngay.conf
 
 a2enconf ngatngay
-systemctl reload apache2
+systemctl restart apache2
 
 echo 1 > $INSTALLED_FILE
+
+echo
+echo "cai dat thanh cong!"
+

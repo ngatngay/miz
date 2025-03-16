@@ -1,21 +1,22 @@
 #!/bin/bash
 
-source ./ampm.sh
+ROOT_PATH="$(dirname "$(realpath "$0")")"
+
+source $ROOT_PATH/ampm.sh
 
 mkdir -p /www
 mkdir -p /www/backup
-
 mkdir -p /etc/ngatngay
 
 MENU_OPTIONS=(
     "cai dat / cap nhat|src/install.sh"
-    "danh sach domain|./src/domain_list.sh"
-    "danh sach php|./src/php_list.sh"
-    "cai dat php|./src/php_install.sh"
-    "them domain|./src/domain_create.sh"
-    "thong tin|./src/info.sh"
+    "danh sach domain|src/domain_list.sh"
+    "danh sach php|src/php_list.sh"
+    "cai dat php|src/php_install.sh"
+    "them domain|src/domain_create.sh"
+    "cap nhat cau hinh|src/update_config.sh"
+    "thong tin|src/info.sh"
 )
-
 
 echo "Apache - MariaDB - PHP Manager"
 echo "----------"
@@ -45,7 +46,7 @@ if [[ $choice -ge 0 && $choice -lt ${#MENU_OPTIONS[@]} ]]; then
     clear
 
     IFS="|" read -r _ action <<< "${MENU_OPTIONS[choice]}"
-    source $action
+    source $ROOT_PATH/$action
 else
     echo "Lựa chọn không hợp lệ, vui lòng chọn lại."
     exit 1

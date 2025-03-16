@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source ./src/php_list.sh
+source $ROOT_PATH/src/php_list.sh
 
 echo
 read -p "Nhập phiên bản PHP cần cài: " version

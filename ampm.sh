@@ -1,12 +1,24 @@
 #!/bin/bash
 
-INSTALLED_FILE=/etc/ngatngay/installed
+INSTALLED_FILE="/etc/ngatngay/installed"
 
 installed() {
     [[ -f $INSTALLED_FILE ]]
 }
 
-list_php() {
+domain_valid() {
+    local domain="$1"
+    local regex="^([a-zA-Z0-9][-a-zA-Z0-9]*\.)+[a-zA-Z]{2,}$"
+
+    if [[ "$domain" =~ $regex ]]; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+
+php_list() {
     if [ -d "/etc/php/" ]; then
         php_versions=()
 

@@ -1,26 +1,26 @@
+echo "updating..."
+
 # apache
 # Bật module cần thiết
-a2enmod md ssl headers rewrite proxy proxy_hcheck proxy_balancer proxy_fcgi proxy_http proxy_wstunnel
+a2enmod md ssl headers rewrite proxy proxy_hcheck proxy_balancer proxy_fcgi proxy_http proxy_wstunnel 1>/dev/null
 
 cp ${ROOT_PATH}/tpl/apache.conf /etc/apache2/conf-available/ngatngay.conf
-a2enconf ngatngay
+a2enconf ngatngay 1>/dev/null
 
-a2dissite '*'
+a2dissite '*' 1>/dev/null
 
 rm -f /etc/apache2/sites-available/*
 
 cp ${ROOT_PATH}/tpl/apache_vhost_default.conf /etc/apache2/sites-available/
-a2ensite apache_vhost_default
+a2ensite apache_vhost_default 1>/dev/null
 
 cp ${ROOT_PATH}/tpl/apache_vhost_default_ssl.conf /etc/apache2/sites-available/
-a2ensite apache_vhost_default_ssl
+a2ensite apache_vhost_default_ssl 1>/dev/null
 
 # php
 for f in $(php_list); do
     cp $ROOT_PATH/tpl/php.ini /etc/php/${f}/cli/conf.d/99-ngatngay.ini
     cp $ROOT_PATH/tpl/php.ini /etc/php/${f}/fpm/conf.d/99-ngatngay.ini
-    
-    systemctl restart php${f}-fpm
 done
 
 for p in $(php_list); do
@@ -50,7 +50,7 @@ for d in $dir/*/; do
     fi
 
     envsubst < $d/apache.conf > /etc/apache2/sites-available/${tpl_domain}.conf
-    a2ensite $tpl_domain
+    a2ensite $tpl_domain 1>/dev/null
     
     # php
     if [ ! -f "$d/php-fpm.conf" ]; then
@@ -69,3 +69,6 @@ done
 
 # apache
 systemctl restart apache2
+
+echo "---"
+echo "updated"

@@ -2,16 +2,11 @@
 
 echo "--- Danh sách domain ---"
 
-HIDDEN_FILES=(
-    "000-default"
-    "default-ssl"
-)
-
 DOMAIN_LIST=()
 
 # Lấy danh sách domain hợp lệ và gán số cho từng domain
 i=1
-for file in /etc/apache2/sites-available/*.conf; do
+for file in /etc/ngatngay/domain/*; do
     name="$(basename "$file" .conf)"
 
     skip=false

@@ -1,5 +1,3 @@
-#!/bin/bash
-
 phps=("7.4" "8.3")
 
 if installed; then
@@ -9,7 +7,7 @@ if installed; then
 fi
 
 apt update
-apt upgrade
+apt upgrade -y
 
 apt install neovim git fish rclone restic
 
@@ -42,32 +40,16 @@ fi
 # php
 if ! installed; then
     for i in "${phps[@]}"; do
-        install_php $i
+        php_install $i
     done
 fi
 
-for f in $(list_php); do
-    cp $ROOT_PATH/tpl/php.ini /etc/php/${f}/cli/conf.d/99-ngatngay.ini
-    cp $ROOT_PATH/tpl/php.ini /etc/php/${f}/fpm/conf.d/99-ngatngay.ini
-    
-    systemctl restart php${f}-fpm.service
-done
-
 # apahce
 if ! installed; then
+    echo
 fi
-
-# Bật module cần thiết
-a2enmod md ssl headers rewrite proxy proxy_hcheck proxy_balancer proxy_fcgi proxy_http proxy_wstunnel
-
-# cau hinh
-cp $ROOT_PATH/tpl/apache.conf /etc/apache2/conf-available/ngatngay.conf
-
-a2enconf ngatngay
-systemctl restart apache2
 
 echo 1 > $INSTALLED_FILE
 
 echo
-echo "cai dat thanh cong!"
-
+echo "cai dat / cap nhat thanh cong!"

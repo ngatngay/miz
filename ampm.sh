@@ -1,9 +1,19 @@
 #!/bin/bash
 
-INSTALLED_FILE="/etc/ngatngay/installed"
+INSTALLED_FILE="/opt/ampm_data/installed"
 
 installed() {
     [[ -f $INSTALLED_FILE ]]
+}
+
+efw() {
+    local char="${1:--}"
+    printf '%*s\n' "$(tput cols)" '' | tr ' ' "$char"
+}
+
+ehw() {
+    local char="${1:--}"
+    printf '%*s\n' "$(( $(tput cols) / 2 ))" '' | tr ' ' "$char"
 }
 
 domain_valid() {
@@ -45,6 +55,8 @@ php_install() {
     local packages=(
         "php${version}"
         "php${version}-apcu"
+        "php${version}-memcached"
+        "php${version}-redis"
         "php${version}-cli"
         "php${version}-curl"
         "php${version}-fpm"

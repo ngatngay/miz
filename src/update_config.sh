@@ -1,5 +1,11 @@
 echo "updating..."
 
+# log
+cp -p ${ROOT_PATH}/ampm_gen_weblog.sh /etc/cron.daily/
+
+cp ${ROOT_PATH}/tpl/systemd-journald.conf /etc/systemd/journald.conf
+systemctl restart systemd-journald
+
 # apache
 # Bật module cần thiết
 a2enmod md ssl headers rewrite proxy proxy_hcheck proxy_balancer proxy_fcgi proxy_http proxy_wstunnel 1>/dev/null
@@ -33,7 +39,7 @@ for p in $(php_list); do
 done
 
 # for domain
-dir="/etc/ngatngay/domain"
+dir="/opt/ampm_data/domain"
 
 for d in $dir/*/; do
     [[ ! -d "$d" ]] && continue
@@ -48,6 +54,8 @@ for d in $dir/*/; do
     if [ ! -f "$d/apache.conf" ]; then
         cp $ROOT_PATH/tpl/apache_vhost.conf $d/apache.conf
     fi
+
+    export APACHE_LOG_DIR='${APACHE_LOG_DIR}'
 
     envsubst < $d/apache.conf > /etc/apache2/sites-available/${tpl_domain}.conf
     a2ensite $tpl_domain 1>/dev/null
@@ -64,7 +72,10 @@ done
 
 #php
 for p in $(php_list); do
-    systemctl restart php${p}-fpm
+    systemctl stop php${p}-fpm
+done
+for p in $(php_list); do
+    systemctl start php${p}-fpm
 done
 
 # apache

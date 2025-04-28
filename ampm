@@ -6,7 +6,7 @@ source $ROOT_PATH/ampm.sh
 
 mkdir -p /www
 mkdir -p /www/backup
-mkdir -p /etc/ngatngay
+mkdir -p /opt/ampm_data
 
 MENU_OPTIONS=(
     "cai dat / cap nhat|src/install.sh"
@@ -19,7 +19,7 @@ MENU_OPTIONS=(
 )
 
 echo "Apache - MariaDB - PHP Manager"
-echo "----------"
+ehw "="
 
 for i in "${!MENU_OPTIONS[@]}"; do
     IFS="|" read -r name _ <<< "${MENU_OPTIONS[i]}"

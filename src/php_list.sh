@@ -3,6 +3,6 @@
 echo "PHP Installed"
 echo "---"
 
-for f in $(list_php); do
+for f in $(php_list); do
     echo $f
 done

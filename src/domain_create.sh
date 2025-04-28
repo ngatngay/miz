@@ -37,7 +37,7 @@ fi
 echo
 
 # gen config
-domain_config_dir=/etc/ngatngay/domain/$domain
+domain_config_dir=/opt/ampm_data/domain/$domain
 
 mkdir -p $domain_config_dir
 

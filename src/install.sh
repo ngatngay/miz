@@ -9,7 +9,7 @@ fi
 apt update
 apt upgrade -y
 
-apt install neovim git fish rclone restic
+apt install cron logrotate neovim git fish restic
 
 # init
 restic self-update

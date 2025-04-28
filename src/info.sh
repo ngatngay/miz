@@ -1,11 +1,10 @@
 echo "info"
+ehw "="
 
-echo "----------"
 apachectl -v
-
 echo "----------"
+
 mariadb -V
-
 echo "----------"
-php -v
 
+php -v

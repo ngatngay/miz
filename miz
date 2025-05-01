@@ -2,11 +2,11 @@
 
 ROOT_PATH="$(dirname "$(realpath "$0")")"
 
-source $ROOT_PATH/ampm.sh
+source $ROOT_PATH/miz.sh
 
 mkdir -p /www
 mkdir -p /www/backup
-mkdir -p /opt/ampm_data
+mkdir -p /opt/miz_data
 
 MENU_OPTIONS=(
     "cai dat / cap nhat|src/install.sh"

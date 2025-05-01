@@ -1,34 +1,22 @@
 echo "updating..."
 
 # log
-cp -p ${ROOT_PATH}/ampm_gen_weblog.sh /etc/cron.daily/
+cp -p ${ROOT_PATH}/miz_gen_weblog.sh /etc/cron.daily/
 
 cp ${ROOT_PATH}/tpl/systemd-journald.conf /etc/systemd/journald.conf
 systemctl restart systemd-journald
 
-# apache
-# Bật module cần thiết
-a2enmod md ssl headers rewrite proxy proxy_hcheck proxy_balancer proxy_fcgi proxy_http proxy_wstunnel 1>/dev/null
+# nginx
+rm -f /etc/nginx/sites-available/*
+rm -f /etc/nginx/sites-enabled/*
 
-cp ${ROOT_PATH}/tpl/apache.conf /etc/apache2/conf-available/ngatngay.conf
-a2enconf ngatngay 1>/dev/null
-
-a2dissite '*' 1>/dev/null
-
-rm -f /etc/apache2/sites-available/*
-
-cp ${ROOT_PATH}/tpl/apache_vhost_default.conf /etc/apache2/sites-available/
-a2ensite apache_vhost_default 1>/dev/null
-
-cp ${ROOT_PATH}/tpl/apache_vhost_default_ssl.conf /etc/apache2/sites-available/
-a2ensite apache_vhost_default_ssl 1>/dev/null
-
-# php
+# php config
 for f in $(php_list); do
     cp $ROOT_PATH/tpl/php.ini /etc/php/${f}/cli/conf.d/99-ngatngay.ini
     cp $ROOT_PATH/tpl/php.ini /etc/php/${f}/fpm/conf.d/99-ngatngay.ini
 done
 
+# php pool
 for p in $(php_list); do
     pool_dir=/etc/php/${p}/fpm/pool.d
     
@@ -39,36 +27,47 @@ for p in $(php_list); do
 done
 
 # for domain
-dir="/opt/ampm_data/domain"
+dir="/opt/miz_data/domain"
+chown -R www-data:www-data $dir
 
-for d in $dir/*/; do
-    [[ ! -d "$d" ]] && continue
-
+for d in $dir/*; do
     source $d/config.sh
+    export tpl_domain="${tpl_domains%% *}"
+    tpls=$(printf '${%s} ' $(env | grep '^tpl_' | cut -d= -f1))
 
-    if [ "$tpl_php_version" == "0" ]; then
-        export tpl_php=""
+    # nginx
+    #if [ ! -f "$d/nginx.conf" ]; then
+    envsubst "$tpls" < $ROOT_PATH/tpl/nginx_vhost.conf > $d/nginx.conf
+    #fi
+
+    if [ "$tpl_php" = "0" ]; then
+        sed -i '/^#php$/,/^#php_end$/d' "$d/nginx.conf"
     fi
-
-    # apache
-    if [ ! -f "$d/apache.conf" ]; then
-        cp $ROOT_PATH/tpl/apache_vhost.conf $d/apache.conf
+    if [ -f "$d/nginx.rewrite.conf" ]; then
+        sed -e '/#rewrite/,/#rewrite_end/{//!d}' -e "/#rewrite$/r $d/nginx.rewrite.conf" $d/nginx.conf > tmp && mv tmp $d/nginx.conf
     fi
-
-    export APACHE_LOG_DIR='${APACHE_LOG_DIR}'
-
-    envsubst < $d/apache.conf > /etc/apache2/sites-available/${tpl_domain}.conf
-    a2ensite $tpl_domain 1>/dev/null
+    nginx_vhost_add ${tpl_domain}.conf $d/nginx.conf
     
+    #ssl
+    IFS=' ' read -r -a domain_list <<< "$tpl_domains"
+    
+    if [[ -f "$d/certbot_dns_cloudflare.ini" ]]; then
+        chmod 600 $d/certbot_dns_cloudflare.ini
+        #certbot certonly --quiet --non-interactive --dns-cloudflare --dns-cloudflare-credentials $d/certbot_dns_cloudflare.ini $(printf -- '-d %s ' "${domain_list[@]}")
+    else
+        #certbot certonly --nginx --quiet --non-interactive $(printf -- '-d %s ' "${domain_list[@]}")
+        echo
+    fi
+
     # php
     if [ ! -f "$d/php-fpm.conf" ]; then
-        cp $ROOT_PATH/tpl/php-fpm.conf $d/php-fpm.conf
+        envsubst "$tpls" < $ROOT_PATH/tpl/php-fpm.conf > $d/php-fpm.conf 
     fi
-
-    if [ "$tpl_php_version" != "0" ]; then
-        envsubst < ${d}/php-fpm.conf > /etc/php/${tpl_php_version}/fpm/pool.d/${tpl_domain}.conf
-    fi
+    cp $d/php-fpm.conf /etc/php/${tpl_php_version}/fpm/pool.d/${tpl_domain}.conf
 done
+
+# nginx
+nginx_vhost_add default ${ROOT_PATH}/tpl/nginx_vhost_default.conf
 
 #php
 for p in $(php_list); do
@@ -78,8 +77,9 @@ for p in $(php_list); do
     systemctl start php${p}-fpm
 done
 
-# apache
-systemctl restart apache2
+# nginx
+nginx -t || exit 1
+systemctl restart nginx
 
 echo "---"
 echo "updated"

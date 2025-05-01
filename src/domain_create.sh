@@ -37,7 +37,7 @@ fi
 echo
 
 # gen config
-domain_config_dir=/opt/ampm_data/domain/$domain
+domain_config_dir=/opt/miz_data/domain/$domain
 
 mkdir -p $domain_config_dir
 
@@ -50,11 +50,9 @@ tpl_php=$(cat <<EOT
 EOT
 )
 
-export tpl_domain=$domain
 export tpl_domains=$domains
 export tpl_dir=$domain_path
-export tpl_php_version=$php_version
-export tpl_php=$tpl_php
+export tpl_php=$php_version
 
 declare -px | grep '^declare -x tpl_' > $domain_config_dir/config.sh
 

@@ -1,6 +1,7 @@
 #!/bin/bash
 
-INSTALLED_FILE="/opt/ampm_data/installed"
+INSTALLED_FILE="/opt/miz_data/installed"
+PHP_DEFAULT="8.3"
 
 installed() {
     [[ -f $INSTALLED_FILE ]]
@@ -71,4 +72,12 @@ php_install() {
     
     sudo apt update
     sudo apt install -y "${packages[@]}"
+}
+
+nginx_vhost_add() {
+    local name="$1"
+    local conf="$2"
+
+    cp $conf /etc/nginx/sites-available/$name
+    cp $conf /etc/nginx/sites-enabled/$name
 }

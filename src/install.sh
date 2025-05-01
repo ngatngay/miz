@@ -1,5 +1,3 @@
-phps=("7.4" "8.3")
-
 if installed; then
     echo "---"
     echo "script installed, only update"
@@ -9,7 +7,7 @@ fi
 apt update
 apt upgrade -y
 
-apt install cron logrotate neovim git fish restic
+apt install sudo cron logrotate neovim git fish restic
 
 # init
 restic self-update
@@ -39,12 +37,10 @@ fi
 
 # php
 if ! installed; then
-    for i in "${phps[@]}"; do
-        php_install $i
-    done
+    php_install PHP_DEFAULT
 fi
 
-# apahce
+# nginx
 if ! installed; then
     echo
 fi

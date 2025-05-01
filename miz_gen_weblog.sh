@@ -1,6 +1,6 @@
 #!/bin/bash
 
-LOG_DIR="/var/log/apache2"
+LOG_DIR="/var/log/nginx"
 REPORT_DIR="/var/www/_weblog"
 
 mkdir -p "$REPORT_DIR"

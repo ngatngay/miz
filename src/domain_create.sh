@@ -37,7 +37,7 @@ fi
 echo
 
 # gen config
-domain_config_dir=/opt/miz_data/domain/$domain
+domain_config_dir=/www/miz_data/domain/$domain
 
 mkdir -p $domain_config_dir
 

@@ -6,7 +6,7 @@ DOMAIN_LIST=()
 
 # Lấy danh sách domain hợp lệ và gán số cho từng domain
 i=1
-for file in /opt/miz_data/domain/*; do
+for file in /www/miz_data/domain/*; do
     name="$(basename "$file" .conf)"
 
     skip=false

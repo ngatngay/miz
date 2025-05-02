@@ -5,49 +5,57 @@ ROOT_PATH="$(dirname "$(realpath "$0")")"
 source $ROOT_PATH/miz.sh
 
 mkdir -p /www
-mkdir -p /www/backup
-mkdir -p /opt/miz_data
+mkdir -p /www/miz_data
 
 MENU_OPTIONS=(
-    "cai dat / cap nhat|src/install.sh"
-    "danh sach domain|src/domain_list.sh"
-    "danh sach php|src/php_list.sh"
-    "cai dat php|src/php_install.sh"
-    "them domain|src/domain_create.sh"
-    "cap nhat cau hinh|src/update_config.sh"
-    "thong tin|src/info.sh"
+    "install_or_update"
+    "domain_list"
+    "php_list"
+    "php_install"
+    "domain_create"
+    "update_web_config"
+    "file_manager"
+    "info"
 )
 
-echo "Apache - MariaDB - PHP Manager"
-ehw "="
-
-for i in "${!MENU_OPTIONS[@]}"; do
-    IFS="|" read -r name _ <<< "${MENU_OPTIONS[i]}"
-    echo "$((i + 1)). $name"
-done
-
-# Nhập lựa chọn
-if [[ -n $1 ]]; then
-    choice=$1
+# run fast
+if [ -n "$1" ]; then
+    input="$1"
+    for opt in "${MENU_OPTIONS[@]}"; do
+        if [[ "$input" == "$opt" ]]; then
+            script_path="$ROOT_PATH/src/$input.sh"
+            source "$script_path" # "${@:2}"
+            break
+        fi
+    done
 else
+    echo "Linux - Manager Easy"
+    ehw "="
+    
+    for i in "${!MENU_OPTIONS[@]}"; do
+        name="${MENU_OPTIONS[i]}"
+        echo "$((i + 1)). $name"
+    done
+    
+    # Nhập lựa chọn
     read -rp "Nhập lựa chọn của bạn: " choice
-fi
-
-# Kiểm tra lựa chọn có hợp lệ không
-if ! [[ $choice =~ ^[0-9]+$ ]]; then
-    echo "Lựa chọn không hợp lệ, vui lòng nhập số."
-    exit 1
-fi
-
-choice=$((choice - 1))
-
-# Xử lý lựa chọn
-if [[ $choice -ge 0 && $choice -lt ${#MENU_OPTIONS[@]} ]]; then
-    clear
-
-    IFS="|" read -r _ action <<< "${MENU_OPTIONS[choice]}"
-    source $ROOT_PATH/$action
-else
-    echo "Lựa chọn không hợp lệ, vui lòng chọn lại."
-    exit 1
+    
+    # Kiểm tra lựa chọn có hợp lệ không
+    if ! [[ $choice =~ ^[0-9]+$ ]]; then
+        echo "Lựa chọn không hợp lệ, vui lòng nhập số."
+        exit 1
+    fi
+    
+    choice=$((choice - 1))
+    
+    # Xử lý lựa chọn
+    if [[ $choice -ge 0 && $choice -lt ${#MENU_OPTIONS[@]} ]]; then
+        clear
+    
+        action="${MENU_OPTIONS[choice]}"
+        source $ROOT_PATH/src/$action.sh
+    else
+        echo "Lựa chọn không hợp lệ, vui lòng chọn lại."
+        exit 1
+    fi
 fi

@@ -1,7 +1,7 @@
 echo "info"
 ehw "="
 
-apachectl -v
+nginx -v
 echo "----------"
 
 mariadb -V

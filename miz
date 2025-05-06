@@ -7,16 +7,12 @@ source $ROOT_PATH/miz.sh
 mkdir -p /www
 mkdir -p /www/miz_data
 
-MENU_OPTIONS=(
-    "install_or_update"
-    "domain_list"
-    "php_list"
-    "php_install"
-    "domain_create"
-    "update_web_config"
-    "file_manager"
-    "info"
-)
+MENU_OPTIONS=()
+
+for filepath in $ROOT_PATH/src/*.sh; do
+    filename=$(basename "$filepath" .sh)
+    MENU_OPTIONS+=("$filename")
+done
 
 # run fast
 if [ -n "$1" ]; then

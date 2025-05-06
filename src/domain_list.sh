@@ -33,7 +33,7 @@ if [[ "$input" =~ ^[0-9]+$ ]]; then
     index=$((input - 1))
     if [[ "$index" -ge 0 && "$index" -lt "${#DOMAIN_LIST[@]}" ]]; then
         domain="${DOMAIN_LIST[$index]}"
-        nvim "/etc/apache2/sites-available/$domain.conf"
+        nvim "/www/miz_data/domain/$domain/nginx.conf"
     else
         echo "Số không hợp lệ!"
     fi

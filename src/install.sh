@@ -7,31 +7,15 @@ fi
 apt update
 apt upgrade -y
 
-apt install sudo cron logrotate neovim git fish restic
+# common tool
+apt install sudo cron logrotate goaccess neovim git fish restic ssl-cert
 
 # init
 restic self-update
 
 # mariadb
 if ! installed; then
-    sudo apt-get install apt-transport-https curl
-    sudo mkdir -p /etc/apt/keyrings
-    sudo curl -o /etc/apt/keyrings/mariadb-keyring.pgp 'https://mariadb.org/mariadb_release_signing_key.pgp'
-
-    cat << 'EOF' > /etc/apt/sources.list.d/mariadb.sources
-# MariaDB 10.11 repository list - created 2025-03-12 01:45 UTC
-# https://mariadb.org/download/
-X-Repolib-Name: MariaDB
-Types: deb
-# deb.mariadb.org is a dynamic mirror if your preferred mirror goes offline. See https://mariadb.org/mirrorbits/ for details.
-# URIs: https://deb.mariadb.org/10.11/debian
-URIs: https://vn-mirrors.vhost.vn/mariadb/repo/10.11/debian
-Suites: bookworm
-Components: main
-Signed-By: /etc/apt/keyrings/mariadb-keyring.pgp
-EOF
-
-    sudo apt-get update
+    curl -LsS https://r.mariadb.com/downloads/mariadb_repo_setup | sudo bash -s -- --mariadb-server-version="mariadb-11.4"
     sudo apt-get install mariadb-server
 fi
 
@@ -43,6 +27,21 @@ fi
 # nginx
 if ! installed; then
     echo
+fi
+
+#cerbot
+if ! installed; then
+    sudo apt update
+    sudo apt install python3 python3-venv libaugeas0
+
+    sudo python3 -m venv /opt/certbot/
+    sudo /opt/certbot/bin/pip install --upgrade pip
+
+    sudo /opt/certbot/bin/pip install --upgrade certbot certbot-nginx certbot-dns-cloudflare
+
+    sudo ln -s /opt/certbot/bin/certbot /usr/bin/certbot
+else
+    sudo /opt/certbot/bin/pip install --upgrade certbot certbot-nginx certbot-dns-cloudflare
 fi
 
 echo 1 > $INSTALLED_FILE

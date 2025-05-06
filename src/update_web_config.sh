@@ -11,6 +11,8 @@ cp ${ROOT_PATH}/tpl/systemd-journald.conf /etc/systemd/journald.conf
 systemctl restart systemd-journald
 
 # nginx
+sudo systemctl stop nginx
+
 rm -f /etc/nginx/sites-available/*
 rm -f /etc/nginx/sites-enabled/*
 
@@ -30,6 +32,9 @@ for p in $(php_list); do
     envsubst < ${ROOT_PATH}/tpl/php-fpm-default.conf > $pool_dir/www.conf
 done
 
+# php pool admin
+#envsubst < ${ROOT_PATH}/tpl/php-fpm-admin.conf > /etc/php/${PHP_DEFAULT}/fpm/pool.d/admin.conf
+
 # for domain
 dir="/www/miz_data/domain"
 chown -R www-data:www-data $dir
@@ -46,7 +51,10 @@ for d in $dir/*; do
         sed -i '/^#php$/,/^#php_end$/d' "$d/nginx.conf"
     fi
     if [ -f "$d/nginx.rewrite.conf" ]; then
-        sed -e '/#rewrite/,/#rewrite_end/{//!d}' -e "/#rewrite$/r $d/nginx.rewrite.conf" $d/nginx.conf > tmp && mv tmp $d/nginx.conf
+        #echo $d
+        python3 $ROOT_PATH/miz_tpl_replace.py $d/nginx.conf $d/nginx.rewrite.conf $d/nginx.conf
+        #exit
+        #sed -e '/#rewrite/,/#rewrite_end/{//!d}' -e "/#rewrite$/r $d/nginx.rewrite.conf" $d/nginx.conf > tmp && mv tmp $d/nginx.conf
     fi
 
     nginx_vhost_add ${tpl_domain}.conf $d/nginx.conf
@@ -57,9 +65,9 @@ for d in $dir/*; do
         
         if [[ -f "$d/certbot_dns_cloudflare.ini" ]]; then
             chmod 600 $d/certbot_dns_cloudflare.ini
-            certbot certonly --quiet --non-interactive --dns-cloudflare --dns-cloudflare-credentials $d/certbot_dns_cloudflare.ini $(printf -- '-d %s ' "${domain_list[@]}")
+            certbot certonly --agree-tos --quiet --non-interactive --dns-cloudflare --dns-cloudflare-credentials $d/certbot_dns_cloudflare.ini $(printf -- '-d %s ' "${domain_list[@]}")
         else
-            certbot certonly --nginx --quiet --non-interactive $(printf -- '-d %s ' "${domain_list[@]}")
+            certbot certonly --standalone --agree-tos --quiet --non-interactive $(printf -- '-d %s ' "${domain_list[@]}")
         fi
     fi
 
@@ -79,10 +87,14 @@ for p in $(php_list); do
 done
 
 # nginx
+
+cp -f ${ROOT_PATH}/tpl/nginx.conf /etc/nginx/nginx.conf
+
+nginx_vhost_add admin ${ROOT_PATH}/tpl/nginx_vhost_admin.conf
 nginx_vhost_add default ${ROOT_PATH}/tpl/nginx_vhost_default.conf
 nginx -t || exit 1
 
-systemctl restart nginx
+systemctl start nginx
 
 # finish
 echo "---"

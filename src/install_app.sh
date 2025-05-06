@@ -1,11 +1,25 @@
+cd /www/miz_app
+
 if [ ! -d '/www/miz_app/file-manager' ]; then
-    cd /www/miz_app
     mkdir file-manager
     cd file-manager
 
     curl -O -L https://github.com/ngatngay/file-manager/releases/latest/download/file-manager.zip
     unzip file-manager.zip
 fi
+
+if [ ! -d '/www/miz_app/phpmyadmin' ]; then
+    PMA_VERSION="5.2.2"
+    PMA_NAME="phpMyAdmin-${PMA_VERSION}-english"
+    PMA_LINK="https://files.phpmyadmin.net/phpMyAdmin/${PMA_VERSION}/${PMA_NAME}.zip"
+    
+    curl -O -L $PMA_LINK
+    unzip "${PMA_NAME}.zip"
+    mv $PMA_NAME phpmyadmin
+    rm "${PMA_NAME}.zip"
+fi
+
+exit
 
 ip=$(curl -s ipinfo.io/ip)
 while true; do

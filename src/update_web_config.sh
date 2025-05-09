@@ -10,11 +10,21 @@ cp -p ${ROOT_PATH}/miz_gen_weblog.sh /etc/cron.daily/
 cp ${ROOT_PATH}/tpl/systemd-journald.conf /etc/systemd/journald.conf
 systemctl restart systemd-journald
 
+cp ${ROOT_PATH}/tpl/logrotate.nginx.conf /etc/logrotate.d/miz_nginx
+
+#security
+cp ${ROOT_PATH}/tpl/fail2ban.conf /etc/fail2ban/jail.local
+sudo systemctl restart fail2ban
+
 # nginx
 sudo systemctl stop nginx
 
 rm -f /etc/nginx/sites-available/*
 rm -f /etc/nginx/sites-enabled/*
+
+#ssl
+echo -e "#!/bin/bash\ncertbot renew --quiet" | sudo tee /etc/cron.daily/certbot-renew > /dev/null
+sudo chmod +x /etc/cron.daily/certbot-renew
 
 # php config
 for f in $(php_list); do
@@ -48,13 +58,10 @@ for d in $dir/*; do
     envsubst "$tpls" < $ROOT_PATH/tpl/nginx_vhost.conf > $d/nginx.conf
 
     if [ "$tpl_php" = "0" ]; then
-        sed -i '/^#php$/,/^#php_end$/d' "$d/nginx.conf"
+        sed -i '/^#php_start$/,/^#php_end$/d' "$d/nginx.conf"
     fi
     if [ -f "$d/nginx.rewrite.conf" ]; then
-        #echo $d
         python3 $ROOT_PATH/miz_tpl_replace.py $d/nginx.conf $d/nginx.rewrite.conf $d/nginx.conf
-        #exit
-        #sed -e '/#rewrite/,/#rewrite_end/{//!d}' -e "/#rewrite$/r $d/nginx.rewrite.conf" $d/nginx.conf > tmp && mv tmp $d/nginx.conf
     fi
 
     nginx_vhost_add ${tpl_domain}.conf $d/nginx.conf
@@ -88,7 +95,7 @@ done
 
 # nginx
 
-cp -f ${ROOT_PATH}/tpl/nginx.conf /etc/nginx/nginx.conf
+cp ${ROOT_PATH}/tpl/nginx.conf /etc/nginx/nginx.conf
 
 nginx_vhost_add admin ${ROOT_PATH}/tpl/nginx_vhost_admin.conf
 nginx_vhost_add default ${ROOT_PATH}/tpl/nginx_vhost_default.conf

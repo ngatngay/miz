@@ -5,7 +5,6 @@ if installed; then
 fi
 
 apt update
-apt upgrade -y
 
 # common tool
 apt install sudo cron logrotate goaccess neovim git fish restic ssl-cert
@@ -32,7 +31,7 @@ fi
 #cerbot
 if ! installed; then
     sudo apt update
-    sudo apt install python3 python3-venv libaugeas0
+    sudo apt install python3 python3-venv libaugeas-dev
 
     sudo python3 -m venv /opt/certbot/
     sudo /opt/certbot/bin/pip install --upgrade pip

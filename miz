@@ -4,9 +4,6 @@ set -euo pipefail
 ROOT_PATH="$(dirname "$(realpath "$0")")"
 source $ROOT_PATH/miz.sh
 
-mkdir -p /www
-mkdir -p /www/miz_data
-
 MENU_OPTIONS=()
 
 for filepath in $ROOT_PATH/src/*.sh; do

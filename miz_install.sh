@@ -1,4 +1,8 @@
 #!/bin/bash
+set -euo pipefail
+
+apt update
+apt install git -y
 
 mkdir -p /www
 mkdir -p /www/miz_app
@@ -6,6 +10,7 @@ mkdir -p /www/miz_data
 mkdir -p /www/log
 mkdir -p /www/log/nginx
 mkdir -p /www/log/nginx_html
+mkdir -p /www/web
 
 if [ ! -d '/www/miz' ]; then
     cd /www

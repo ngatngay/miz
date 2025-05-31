@@ -12,7 +12,7 @@ for filepath in $ROOT_PATH/src/*.sh; do
 done
 
 # run fast
-if [ -n "$1" ]; then
+if [ -n "${1-}" ]; then
     input="$1"
     for opt in "${MENU_OPTIONS[@]}"; do
         if [[ "$input" == "$opt" ]]; then

@@ -7,13 +7,13 @@ fi
 apt update
 
 # common tool
-apt install sudo cron logrotate goaccess neovim git fish restic ssl-cert
+apt install sudo dos2unix cron logrotate goaccess neovim git fish restic ssl-cert
 
 # init
 restic self-update
 
 # mariadb
-if ! installed; then
+if ! cmd_exists mariadb; then
     curl -LsS https://r.mariadb.com/downloads/mariadb_repo_setup | sudo bash -s -- --mariadb-server-version="mariadb-11.4"
     sudo apt-get install mariadb-server
 fi
@@ -29,7 +29,7 @@ if ! installed; then
 fi
 
 #cerbot
-if ! installed; then
+if ! cmd_exists certbot; then
     sudo apt update
     sudo apt install python3 python3-venv libaugeas-dev
 
@@ -41,6 +41,13 @@ if ! installed; then
     sudo ln -s /opt/certbot/bin/certbot /usr/bin/certbot
 else
     sudo /opt/certbot/bin/pip install --upgrade certbot certbot-nginx certbot-dns-cloudflare
+fi
+
+# memcached
+if ! cmd_exists memcached; then
+else
+    efw =
+    memcached -V
 fi
 
 echo 1 > $INSTALLED_FILE

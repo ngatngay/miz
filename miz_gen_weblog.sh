@@ -1,7 +1,7 @@
 #!/bin/bash
 
-LOG_DIR="/www/log/nginx"
-REPORT_DIR="/www/log/nginx_html"
+LOG_DIR="/www/log/apache"
+REPORT_DIR="/www/log/apache_html"
 
 mkdir -p "$REPORT_DIR"
 rm -rf $REPORT_DIR/*

@@ -7,6 +7,10 @@ installed() {
     [[ -f $INSTALLED_FILE ]]
 }
 
+cmd_exists() {
+    command -v "$1" >/dev/null 2>&1
+}
+
 efw() {
     local char="${1:--}"
     printf '%*s\n' "$(tput cols)" '' | tr ' ' "$char"
@@ -15,6 +19,18 @@ efw() {
 ehw() {
     local char="${1:--}"
     printf '%*s\n' "$(( $(tput cols) / 2 ))" '' | tr ' ' "$char"
+}
+
+cptpl() {
+    local input="$1"
+    local output="$2"
+    local file="${ROOT_PATH}/tpl/${input}"
+
+    if [ -f "${ROOT_PATH}/tpl_overwrite/${input}" ]; then
+        file="${ROOT_PATH}/tpl_overwrite/${input}"
+    fi
+    
+    cp $file $output
 }
 
 domain_valid() {
@@ -55,7 +71,6 @@ php_install() {
 
     local packages=(
         "php${version}"
-        "php${version}-apcu"
         "php${version}-memcached"
         "php${version}-redis"
         "php${version}-cli"
@@ -80,4 +95,15 @@ nginx_vhost_add() {
 
     cp $conf /etc/nginx/sites-available/$name
     cp $conf /etc/nginx/sites-enabled/$name
+}
+
+websv_start() {
+    echo 1
+}
+
+websv_stop() {
+    sudo systemctl stop nginx
+
+    rm -f /etc/nginx/sites-available/*
+    rm -f /etc/nginx/sites-enabled/*
 }

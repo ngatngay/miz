@@ -71,6 +71,7 @@ php_install() {
 
     local packages=(
         "php${version}"
+        "php${version}-apcu"
         "php${version}-memcached"
         "php${version}-redis"
         "php${version}-cli"
@@ -85,7 +86,7 @@ php_install() {
         "php${version}-zip"
     )
     
-    sudo apt update
+    sudo apt-get update > /dev/null
     sudo apt install -y "${packages[@]}"
 }
 

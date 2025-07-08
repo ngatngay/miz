@@ -4,13 +4,10 @@ if installed; then
     echo "---"
 fi
 
-apt update
+apt-get update -y > /dev/null
+apt-get install sudo dos2unix cron logrotate goaccess neovim git fish restic ssl-cert -y > /dev/null
 
-# common tool
-apt install sudo dos2unix cron logrotate goaccess neovim git fish restic ssl-cert
-
-# init
-restic self-update
+restic self-update > /dev/null
 
 # mariadb
 if ! cmd_exists mariadb; then
@@ -30,7 +27,6 @@ fi
 
 #cerbot
 if ! cmd_exists certbot; then
-    sudo apt update
     sudo apt install python3 python3-venv libaugeas-dev
 
     sudo python3 -m venv /opt/certbot/
@@ -40,14 +36,51 @@ if ! cmd_exists certbot; then
 
     sudo ln -s /opt/certbot/bin/certbot /usr/bin/certbot
 else
-    sudo /opt/certbot/bin/pip install --upgrade certbot certbot-nginx certbot-dns-cloudflare
+    sudo /opt/certbot/bin/pip install --upgrade certbot certbot-nginx certbot-dns-cloudflare > /dev/null
 fi
 
 # memcached
 if ! cmd_exists memcached; then
-else
+(
+    version="1.6.38"
+    
+    apt-get install autotools-dev automake libevent-dev
+    
+    cd /opt/
+    curl -L -o memcached-${version}.tar.gz https://memcached.org/files/memcached-${version}.tar.gz
+    
+    tar -zxvf memcached-${version}.tar.gz
+    cd memcached-${version}
+    
+    ./configure && make && sudo make install
+    
+    # service
+    export PORT=11211
+    export USER=www-data
+    export CACHESIZE=1024
+    export MAXCONN=1024
+    export OPTIONS=""
+    
+    envsubst < ${ROOT_PATH}/tpl/memcached.service > /etc/systemd/system/memcached.service
+    
+    sudo systemctl daemon-reload
+    sudo systemctl enable memcached
+    sudo systemctl start memcached
+    
     efw =
-    memcached -V
+    echo installed memcached-${version}
+    memcached --version
+)
+fi
+
+# composer
+if ! cmd_exists wp; then
+(
+    cd $ROOT_PATH
+    curl -L -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
+    chmod +x wp-cli.phar
+    sudo mv wp-cli.phar /usr/local/bin/wp
+)
 fi
 
 echo 1 > $INSTALLED_FILE

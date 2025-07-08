@@ -153,8 +153,8 @@ a2enconf zzz_ngatngay 1>/dev/null
 
 cp ${ROOT_PATH}/tpl/apache_vhost_default.conf /etc/apache2/sites-available/
 
-a2dissite '*' 1>/dev/null
-a2ensite '*' 1>/dev/null
+a2dissite '*' >/dev/null
+a2ensite '*' >/dev/null
 
 apachectl configtest && systemctl start apache2
 

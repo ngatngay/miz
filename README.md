@@ -2,10 +2,11 @@
 
 - Apache 2.4
 - MariaDB 11.4
-- PHP (multi)
-- Memcached 1.6.38
-- Free SSL (certbot)
-- Tường lửa VIP
+- PHP
+    - composer
+    - wp cli
+- Memcached
+- SSL
 
 ## yêu cầu
 
@@ -34,5 +35,5 @@ Bảo mật cao cấp, sai mật khẩu 5 lần khoá 1 tiếng.
 chmod khi lỗi quyền:
 
 ```
-chown -R www-data:www-data /www
+chown -R www-data:www-data /www/web
 ```

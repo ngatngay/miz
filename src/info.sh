@@ -1,7 +1,7 @@
 echo "info"
 ehw "="
 
-nginx -v
+apache2 -v
 echo "----------"
 
 mariadb -V

@@ -127,6 +127,9 @@ for d in $dir/*; do
             fi
 
             cp $d/apache.conf /etc/apache2/sites-available/${tpl_domain}.conf
+    else
+            sed -i '/^#ssl_file_start$/,/^#ssl_file_end$/d' "$d/apache.conf"
+            cp $d/apache.conf /etc/apache2/sites-available/${tpl_domain}.conf
     fi
 done
 

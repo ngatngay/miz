@@ -5,7 +5,7 @@ import requests
 
 # Cấu hình
 WATCH_DIR = "/www/web"
-STATE_FILE = "/www/miz_data/php_error_log_state.json"
+STATE_FILE = "/www/data/php_error_log_state.json"
 TELEGRAM_TOKEN = "YOUR_BOT_TOKEN"
 TELEGRAM_CHAT_ID = "YOUR_CHAT_ID"
 

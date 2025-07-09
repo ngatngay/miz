@@ -1,6 +1,6 @@
 #!/bin/bash
 
-INSTALLED_FILE="/www/miz_data/installed"
+INSTALLED_FILE="/www/data/installed"
 PHP_DEFAULT="8.3"
 
 installed() {

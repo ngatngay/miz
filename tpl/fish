@@ -4,6 +4,6 @@ if test (id -u) -eq 0
     set -gx PATH /www/miz $PATH
 end
 
-set -gx PATH /www/miz_tool $PATH
+set -gx PATH /www/tool $PATH
 
 zoxide init fish | source

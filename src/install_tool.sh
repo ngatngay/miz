@@ -1,11 +1,13 @@
-cd /www/miz_tool
+cd /www/tool
 
-curl -L https://getcomposer.org/download/latest-stable/composer.phar -o composer
+curl -o composer -L https://getcomposer.org/download/latest-stable/composer.phar
 chmod +x composer
 
-curl -L https://github.com/phpstan/phpstan/releases/latest/download/phpstan.phar -o phpstan
+curl -o phpstan -L https://github.com/phpstan/phpstan/releases/latest/download/phpstan.phar
 chmod +x phpstan
 
-curl -L https://github.com/PHP-CS-Fixer/PHP-CS-Fixer/releases/latest/download/php-cs-fixer.phar -o php-cs-fixer
+curl -o php-cs-fixer -L https://github.com/PHP-CS-Fixer/PHP-CS-Fixer/releases/latest/download/php-cs-fixer.phar
 chmod +x php-cs-fixer
 
+curl -o wp -L https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
+chmod +x wp

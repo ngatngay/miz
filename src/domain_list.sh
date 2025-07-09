@@ -6,7 +6,7 @@ DOMAIN_LIST=()
 
 # Lấy danh sách domain hợp lệ và gán số cho từng domain
 i=1
-for file in /www/miz_data/domain/*; do
+for file in /www/data/domain/*; do
     name="$(basename "$file" .conf)"
 
     skip=false
@@ -33,7 +33,7 @@ if [[ "$input" =~ ^[0-9]+$ ]]; then
     index=$((input - 1))
     if [[ "$index" -ge 0 && "$index" -lt "${#DOMAIN_LIST[@]}" ]]; then
         domain="${DOMAIN_LIST[$index]}"
-        nvim "/www/miz_data/domain/$domain/nginx.conf"
+        nvim "/www/data/domain/$domain/nginx.conf"
     else
         echo "Số không hợp lệ!"
     fi

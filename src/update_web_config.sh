@@ -56,7 +56,7 @@ done
 #envsubst < ${ROOT_PATH}/tpl/php-fpm-admin.conf > /etc/php/${PHP_DEFAULT}/fpm/pool.d/admin.conf
 
 # for domain
-dir="/www/miz_data/domain"
+dir="/www/data/domain"
 chown -R www-data:www-data $dir
 
 for d in $dir/*; do
@@ -65,6 +65,9 @@ for d in $dir/*; do
     export tpl_domain="${tpl_domains%% *}"
     export tpl_domain_dir="/www/web/${tpl_domain}"
     tpls=$(printf '${%s} ' $(env | grep '^tpl_' | cut -d= -f1))
+    
+    #info
+    echo -- $tpl_domain
     
     #pre
     mkdir -p $tpl_domain_dir
@@ -105,37 +108,25 @@ for d in $dir/*; do
     #ssl  
     if [[ "$confirm_ssl" == "y" ]]; then
             IFS=' ' read -r -a domain_list <<< "$tpl_domains"
+            ssl_failed=0
 
             if [[ -f "$d/certbot_dns_cloudflare.ini" ]]; then
                 chmod 600 $d/certbot_dns_cloudflare.ini
-                certbot certonly --agree-tos --quiet --non-interactive --dns-cloudflare --dns-cloudflare-credentials $d/certbot_dns_cloudflare.ini $(printf -- '-d %s ' "${domain_list[@]}")
+                certbot certonly --agree-tos --quiet --non-interactive --dns-cloudflare --dns-cloudflare-credentials $d/certbot_dns_cloudflare.ini $(printf -- '-d %s ' "${domain_list[@]}") || ssl_failed=1
             else
-                certbot certonly --standalone --agree-tos --quiet --non-interactive $(printf -- '-d %s ' "${domain_list[@]}")
+                certbot certonly --standalone --agree-tos --quiet --non-interactive $(printf -- '-d %s ' "${domain_list[@]}") || ssl_failed=1
             fi
-            continue
             
-        declare -A groups
+            if [[ $ssl_failed -eq 1 ]]; then
+                #err
+                sed -i '/^#ssl_file_start$/,/^#ssl_file_end$/d' "$d/apache.conf"
+                echo "- Không lấy được ssl"
+            else
+                #done
+                sed -i '/^#ssl_file_def_start$/,/^#ssl_file_def_end$/d' "$d/apache.conf"
+            fi
 
-        for domain in $tpl_domains; do
-            # Tách domain gốc: 2 phần cuối (ví dụ: domain1.com)
-            root=$(echo "$domain" | awk -F. '{print $(NF-1)"."$NF}')
-            groups["$root"]+="$domain "
-        done
-        echo "'${!groups[@]}'"
-        # In kết quả
-        for root in "${!groups[@]}"; do
-            #echo "Group: $root"
-            echo "Domains: ${groups[$root]}"
-            
-            IFS=' ' read -r -a domain_list <<< "$(echo "${groups[$root]}" | xargs)"
-                  
-            if [[ -f "$d/certbot_dns_cloudflare.ini" ]]; then
-                chmod 600 $d/certbot_dns_cloudflare.ini
-                certbot certonly --agree-tos --quiet --non-interactive --dns-cloudflare --dns-cloudflare-credentials $d/certbot_dns_cloudflare.ini $(printf -- '-d %s ' "${domain_list[@]}")
-            else
-                certbot certonly --standalone --agree-tos --quiet --non-interactive $(printf -- '-d %s ' "${domain_list[@]}")
-            fi
-        done
+            cp $d/apache.conf /etc/apache2/sites-available/${tpl_domain}.conf
     fi
 done
 

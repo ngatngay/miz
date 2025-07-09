@@ -30,7 +30,7 @@ Bảo mật cao cấp, sai mật khẩu 5 lần khoá 1 tiếng.
 ## hệ thống phân quyền
 
 - website: /www/web (/www/web/a.com, /www/web/b.com,... Các website không thể truy cập file lẫn nhau)
-- panel: /www/miz_app
+- panel: /www/app
 
 chmod khi lỗi quyền:
 

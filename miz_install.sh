@@ -5,9 +5,9 @@ apt-get update -y > /dev/null
 apt-get install git -y > /dev/null
 
 mkdir -p /www
-mkdir -p /www/miz_app
-mkdir -p /www/miz_data
-mkdir -p /www/miz_tool
+mkdir -p /www/app
+mkdir -p /www/data
+mkdir -p /www/tool
 mkdir -p /www/log
 mkdir -p /www/log/apache
 mkdir -p /www/log/apache_html

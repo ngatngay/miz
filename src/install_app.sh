@@ -1,6 +1,6 @@
-cd /www/miz_app
+cd /www/app
 
-if [ ! -d '/www/miz_app/file-manager' ]; then
+if [ ! -d '/www/app/file-manager' ]; then
     mkdir file-manager
     cd file-manager
 
@@ -8,7 +8,7 @@ if [ ! -d '/www/miz_app/file-manager' ]; then
     unzip file-manager.zip
 fi
 
-if [ ! -d '/www/miz_app/phpmyadmin' ]; then
+if [ ! -d '/www/app/phpmyadmin' ]; then
     PMA_VERSION="5.2.2"
     PMA_NAME="phpMyAdmin-${PMA_VERSION}-english"
     PMA_LINK="https://files.phpmyadmin.net/phpMyAdmin/${PMA_VERSION}/${PMA_NAME}.zip"
@@ -32,5 +32,5 @@ done
 echo "http://$ip:$port"
 efw =
 
-cd /www/miz_app/file-manager
+cd /www/app/file-manager
 PHP_CLI_SERVER_WORKERS=4 php -S 0.0.0.0:$port

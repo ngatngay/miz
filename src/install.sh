@@ -17,7 +17,7 @@ fi
 
 # php
 if ! installed; then
-    php_install PHP_DEFAULT
+    php_install $PHP_DEFAULT
 fi
 
 # nginx
@@ -70,16 +70,6 @@ if ! cmd_exists memcached; then
     efw =
     echo installed memcached-${version}
     memcached --version
-)
-fi
-
-# composer
-if ! cmd_exists wp; then
-(
-    cd $ROOT_PATH
-    curl -L -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
-    chmod +x wp-cli.phar
-    sudo mv wp-cli.phar /usr/local/bin/wp
 )
 fi
 

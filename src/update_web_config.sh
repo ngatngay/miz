@@ -112,9 +112,9 @@ for d in $dir/*; do
 
             if [[ -f "$d/certbot_dns_cloudflare.ini" ]]; then
                 chmod 600 $d/certbot_dns_cloudflare.ini
-                certbot certonly --agree-tos --quiet --non-interactive --dns-cloudflare --dns-cloudflare-credentials $d/certbot_dns_cloudflare.ini $(printf -- '-d %s ' "${domain_list[@]}") || ssl_failed=1
+                certbot certonly --agree-tos --quiet --non-interactive --expand --dns-cloudflare --dns-cloudflare-credentials $d/certbot_dns_cloudflare.ini $(printf -- '-d %s ' "${domain_list[@]}") || ssl_failed=1
             else
-                certbot certonly --standalone --agree-tos --quiet --non-interactive $(printf -- '-d %s ' "${domain_list[@]}") || ssl_failed=1
+                certbot certonly --standalone --agree-tos --quiet --non-interactive --expand $(printf -- '-d %s ' "${domain_list[@]}") || ssl_failed=1
             fi
             
             if [[ $ssl_failed -eq 1 ]]; then
@@ -126,9 +126,6 @@ for d in $dir/*; do
                 sed -i '/^#ssl_file_def_start$/,/^#ssl_file_def_end$/d' "$d/apache.conf"
             fi
 
-            cp $d/apache.conf /etc/apache2/sites-available/${tpl_domain}.conf
-    else
-            sed -i '/^#ssl_file_start$/,/^#ssl_file_end$/d' "$d/apache.conf"
             cp $d/apache.conf /etc/apache2/sites-available/${tpl_domain}.conf
     fi
 done

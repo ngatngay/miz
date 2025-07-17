@@ -2,7 +2,7 @@
 set -euo pipefail
 
 apt-get update -y > /dev/null
-apt-get install git -y > /dev/null
+apt-get install fish git -y > /dev/null
 
 mkdir -p /www
 mkdir -p /www/app
@@ -24,9 +24,7 @@ fi
 echo 'export PATH="/www/miz:$PATH"' | sudo tee /etc/profile.d/miz.sh > /dev/null
 
 # for fish
-if [ -d /etc/fish/conf.d ]; then
-    cp /www/miz/tpl/fish /etc/fish/conf.d/miz.fish
-fi
+cp /www/miz/tpl/fish /etc/fish/conf.d/miz.fish
 
 echo 'installed /www/miz'
 echo

@@ -6,4 +6,22 @@ end
 
 set -gx PATH /www/tool $PATH
 
-zoxide init fish | source
+if type -q zoxide
+    zoxide init fish | source
+end
+
+function fish_prompt
+    set_color brgreen
+    echo -n [(whoami)]
+    echo -n ' '
+
+    set_color brred
+    echo -n (prompt_pwd)
+
+    echo
+    set_color brcyan
+    echo -n "> "
+
+    set_color normal
+end
+

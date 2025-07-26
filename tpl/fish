@@ -11,6 +11,7 @@ if type -q zoxide
 end
 
 function fish_prompt
+    set -l last_status $status
     set_color brgreen
     echo -n [(whoami)]
     echo -n ' '
@@ -18,8 +19,12 @@ function fish_prompt
     set_color brred
     echo -n (prompt_pwd)
 
+    if test $last_status -ne 0
+        echo -n (set_color brmagenta)" [$last_status]"
+    end
+
     echo
-    set_color brcyan
+    set_color bryellow
     echo -n "> "
 
     set_color normal

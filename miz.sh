@@ -72,6 +72,7 @@ php_install() {
     local packages=(
         "php${version}"
         "php${version}-apcu"
+        "php${version}-bcmath"
         "php${version}-memcached"
         "php${version}-redis"
         "php${version}-cli"

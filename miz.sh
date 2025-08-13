@@ -91,21 +91,32 @@ php_install() {
     sudo apt install -y "${packages[@]}"
 }
 
-nginx_vhost_add() {
-    local name="$1"
-    local conf="$2"
+php_default() {
+    local ver="$1"
+    local bin="/usr/bin/php${ver}"
+    local phpize="/usr/bin/phpize${ver}"
+    local phpconfig="/usr/bin/php-config${ver}"
 
-    cp $conf /etc/nginx/sites-available/$name
-    cp $conf /etc/nginx/sites-enabled/$name
-}
+    if [ ! -x "$bin" ]; then
+        echo "❌ PHP $ver chưa được cài ở $bin"
+        return 1
+    fi
 
-websv_start() {
-    echo 1
-}
+    echo "🔧 Cấu hình PHP $ver làm mặc định..."
 
-websv_stop() {
-    sudo systemctl stop nginx
+    sudo update-alternatives --install /usr/bin/php php "$bin" 100
+    sudo update-alternatives --set php "$bin"
 
-    rm -f /etc/nginx/sites-available/*
-    rm -f /etc/nginx/sites-enabled/*
+    if [ -x "$phpize" ]; then
+        sudo update-alternatives --install /usr/bin/phpize phpize "$phpize" 100
+        sudo update-alternatives --set phpize "$phpize"
+    fi
+
+    if [ -x "$phpconfig" ]; then
+        sudo update-alternatives --install /usr/bin/php-config php-config "$phpconfig" 100
+        sudo update-alternatives --set php-config "$phpconfig"
+    fi
+
+    echo "✅ PHP mặc định hiện tại:"
+    php -v | head -n 1
 }

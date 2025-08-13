@@ -1,0 +1,2 @@
+export PATH="/www/tool:$PATH"
+export PATH="/www/miz:$PATH"

@@ -4,6 +4,17 @@ echo "updating..."
 read -p "Do you update SSL? [y/N]: " confirm_ssl
 confirm_ssl="${confirm_ssl,,}"
 
+if [[ "$confirm_ssl" == "y" ]]; then
+    certbot_key=/www/data/certbot_dns_cloudflare.ini
+
+    if [[ -f "$certbot_key" ]]; then
+        chmod 600 $certbot_key
+    else
+        echo "chua co file $certbot_key"
+        exit
+    fi
+fi
+
 # security system
 cptpl fail2ban.filter.miz_admin.conf /etc/fail2ban/filter.d/
 cptpl fail2ban.conf /etc/fail2ban/jail.local
@@ -17,7 +28,6 @@ cp ${ROOT_PATH}/tpl/systemd-journald.conf /etc/systemd/journald.conf
 systemctl restart systemd-journald
 
 # log rotate
-
 cptpl logrotate.apache.conf /etc/logrotate.d/miz_apache
 
 #ssl
@@ -27,13 +37,7 @@ sudo chmod +x /etc/cron.daily/certbot-renew
 # websv
 
 # apache
-sudo systemctl stop apache2
 rm -f /etc/apache2/sites-available/*
-
-# nginx
-#sudo systemctl stop nginx
-#rm -f /etc/nginx/sites-available/*
-#rm -f /etc/nginx/sites-enabled/*
 
 # php
 for p in $(php_list); do
@@ -79,24 +83,9 @@ for d in $dir/*; do
     if [ "$tpl_php" == "0" ]; then
         sed -i '/^#php_start$/,/^#php_end$/d' "$d/apache.conf"
     fi
-    
+
     cp $d/apache.conf /etc/apache2/sites-available/${tpl_domain}.conf
 
-    #python3 $ROOT_PATH/miz_gen_host.py
-    #exit
-
-    # nginx
-    #envsubst "$tpls" < $ROOT_PATH/tpl/nginx_vhost.conf > $d/nginx.conf
-    #
-    #if [ "$tpl_php" == "0" ]; then
-    #    sed -i '/^#php_start$/,/^#php_end$/d' "$d/nginx.conf"
-    #fi
-    #if [ -f "$d/nginx.rewrite.conf" ]; then
-    #    python3 $ROOT_PATH/miz_tpl_replace.py $d/nginx.conf $d/nginx.rewrite.conf $d/nginx.conf
-    #fi
-
-    #nginx_vhost_add ${tpl_domain}.conf $d/nginx.conf
-  
     # php
     if [ "$tpl_php" != "0" ]; then
         export tpl_dir=$(echo "$tpl_dir" | cut -d'/' -f1-4)
@@ -110,12 +99,8 @@ for d in $dir/*; do
             IFS=' ' read -r -a domain_list <<< "$tpl_domains"
             ssl_failed=0
 
-            if [[ -f "$d/certbot_dns_cloudflare.ini" ]]; then
-                chmod 600 $d/certbot_dns_cloudflare.ini
-                certbot certonly --agree-tos --quiet --non-interactive --expand --dns-cloudflare --dns-cloudflare-credentials $d/certbot_dns_cloudflare.ini $(printf -- '-d %s ' "${domain_list[@]}") || ssl_failed=1
-            else
-                certbot certonly --standalone --agree-tos --quiet --non-interactive --expand $(printf -- '-d %s ' "${domain_list[@]}") || ssl_failed=1
-            fi
+            certbot certonly --agree-tos --quiet --non-interactive --expand --dns-cloudflare --dns-cloudflare-credentials $certbot_key $(printf -- '-d %s ' "${domain_list[@]}") || ssl_failed=1
+            # certbot certonly --standalone --agree-tos --quiet --non-interactive --expand $(printf -- '-d %s ' "${domain_list[@]}") || ssl_failed=1
             
             if [[ $ssl_failed -eq 1 ]]; then
                 #err
@@ -147,16 +132,7 @@ cp ${ROOT_PATH}/tpl/apache_vhost_default.conf /etc/apache2/sites-available/
 a2dissite '*' >/dev/null
 a2ensite '*' >/dev/null
 
-apachectl configtest && systemctl start apache2
-
-# nginx
-#cp ${ROOT_PATH}/tpl/nginx.conf /etc/nginx/nginx.conf
-
-#nginx_vhost_add admin ${ROOT_PATH}/tpl/nginx_vhost_admin.conf
-#nginx_vhost_add default ${ROOT_PATH}/tpl/nginx_vhost_default.conf
-#nginx -t || exit 1
-
-#systemctl start nginx
+apachectl configtest && systemctl restart apache2
 
 # finish
 echo "---"

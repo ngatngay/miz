@@ -21,7 +21,7 @@ fi
 # add PATH
 
 # for bash
-echo 'export PATH="/www/miz:$PATH"' | sudo tee /etc/profile.d/miz.sh > /dev/null
+cp /www/miz/tpl/bash /etc/profile.d/miz.sh
 
 # for fish
 cp /www/miz/tpl/fish /etc/fish/conf.d/miz.fish

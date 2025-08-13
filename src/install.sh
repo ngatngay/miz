@@ -1,42 +1,51 @@
 if installed; then
     echo "---"
     echo "script installed, only update"
+    
+    # confirm update 
+    
     echo "---"
 fi
 
-apt-get update -y > /dev/null
-apt-get install sudo dos2unix cron logrotate goaccess neovim git fish restic ssl-cert -y > /dev/null
+# common tool
+apt-get update -y
+apt-get install -y sudo dos2unix cron logrotate goaccess neovim git fish restic tmux ssl-cert fail2ban software-properties-common vsftpd
 
-restic self-update > /dev/null
+sudo update-alternatives --install /usr/bin/vi vi /usr/bin/nvim 60 && sudo update-alternatives --set vi /usr/bin/nvim
 
-# mariadb
-if ! cmd_exists mariadb; then
-    curl -LsS https://r.mariadb.com/downloads/mariadb_repo_setup | sudo bash -s -- --mariadb-server-version="mariadb-11.4"
-    sudo apt-get install mariadb-server
-fi
+# mariadb 10.11
+apt-get install mariadb-server
+
+# apache
+add-apt-repository -y ppa:ondrej/apache2
+
+apt-get install apache2
 
 # php
-if ! installed; then
-    php_install $PHP_DEFAULT
-fi
+add-apt-repository -y ppa:ondrej/php
 
-# nginx
-if ! installed; then
-    echo
-fi
+php_install 5.6
+php_install 7.4
+php_install 8.0
+php_install 8.1
+php_install 8.2
+php_install 8.3
+php_install 8.4
 
-#cerbot
+php_default 8.3
+
+# ssl - cerbot
 if ! cmd_exists certbot; then
     sudo apt install python3 python3-venv libaugeas-dev
 
     sudo python3 -m venv /opt/certbot/
     sudo /opt/certbot/bin/pip install --upgrade pip
 
-    sudo /opt/certbot/bin/pip install --upgrade certbot certbot-nginx certbot-dns-cloudflare
+    sudo /opt/certbot/bin/pip install --upgrade certbot certbot-dns-cloudflare
 
     sudo ln -s /opt/certbot/bin/certbot /usr/bin/certbot
 else
-    sudo /opt/certbot/bin/pip install --upgrade certbot certbot-nginx certbot-dns-cloudflare > /dev/null
+    sudo /opt/certbot/bin/pip install --upgrade certbot certbot-dns-cloudflare
 fi
 
 # memcached
@@ -44,7 +53,7 @@ if ! cmd_exists memcached; then
 (
     version="1.6.38"
     
-    apt-get install autotools-dev automake libevent-dev
+    apt-get install build-essential autotools-dev automake libevent-dev
     
     cd /opt/
     curl -L -o memcached-${version}.tar.gz https://memcached.org/files/memcached-${version}.tar.gz
@@ -75,5 +84,6 @@ fi
 
 echo 1 > $INSTALLED_FILE
 
+echo
 echo
 echo "cai dat / cap nhat thanh cong!"

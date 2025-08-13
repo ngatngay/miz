@@ -30,3 +30,8 @@ function fish_prompt
     set_color normal
 end
 
+function docker_renew
+    docker compose down
+    docker compose pull
+    docker compose up -d
+end

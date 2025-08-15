@@ -102,16 +102,16 @@ for d in $dir/*; do
             IFS=' ' read -r -a domain_list <<< "$tpl_domains"
             ssl_failed=0
 
-c_args=()
-for c_domain in $tpl_domains; do
-  c_args+=(-d "$c_domain")
-done
-
-certbot certonly --agree-tos --quiet --non-interactive --expand \
-  --dns-cloudflare --dns-cloudflare-credentials "$certbot_key" \
-  --cert-name "$tpl_domain" \
-  "${c_args[@]}" || ssl_failed=1
-
+            c_args=()
+            for c_domain in $tpl_domains; do
+                c_args+=(-d "$c_domain")
+            done
+            
+            certbot certonly --agree-tos --quiet --non-interactive --expand \
+                --dns-cloudflare --dns-cloudflare-credentials "$certbot_key" \
+                --cert-name "$tpl_domain" \
+                "${c_args[@]}" || ssl_failed=1
+            
             # certbot certonly --standalone --agree-tos --quiet --non-interactive --expand $(printf -- '-d %s ' "${domain_list[@]}") || ssl_failed=1
             
             if [[ $ssl_failed -eq 1 ]]; then

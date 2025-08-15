@@ -30,7 +30,15 @@ cptpl() {
         file="${ROOT_PATH}/tpl_overwrite/${input}"
     fi
     
-    cp $file $output
+    cp -f $file $output
+}
+
+rpct() {
+  local search="$1" insert_file="$2" target_file="$3"
+  # escape cho sed
+  local pat
+  pat=$(printf '%s' "$search" | sed 's/[.[\*^$\\/&]/\\&/g')
+  sed -i -e "/$pat/ r $insert_file" -e "/$pat/ d" "$target_file"
 }
 
 domain_valid() {

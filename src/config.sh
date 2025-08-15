@@ -3,7 +3,6 @@
 echo "config-ing..."
 
 # security system
-cptpl fail2ban.filter.miz_admin.conf /etc/fail2ban/filter.d/
 cptpl fail2ban.conf /etc/fail2ban/jail.local
 sudo systemctl restart fail2ban
 
@@ -21,13 +20,27 @@ cptpl logrotate.apache.conf /etc/logrotate.d/miz_apache
 echo -e "#!/bin/bash\ncertbot renew --quiet" | sudo tee /etc/cron.daily/certbot-renew > /dev/null
 sudo chmod +x /etc/cron.daily/certbot-renew
 
+#ftp
+cptpl vsftpd.conf /etc/vsftpd.conf
+systemctl restart vsftpd
 
+# apache
+a2enmod http2 ssl rewrite headers proxy proxy_http proxy_fcgi setenvif ratelimit 1>/dev/null
 
+cp ${ROOT_PATH}/tpl/apache.conf /etc/apache2/conf-available/99-ngatngay.conf
+a2disconf '*' 1>/dev/null
+a2enconf 99-ngatngay 1>/dev/null
 
+rm -f /etc/apache2/sites-available/*
+cptpl apache_vhost_default.conf /etc/apache2/sites-available/99-ngatngay.conf
+
+a2dissite '*' >/dev/null
+a2ensite '*' >/dev/null
+
+apachectl configtest && systemctl restart apache2
 
 # php
 for p in $(php_list); do
-    #stop service
     systemctl stop php${p}-fpm
 
     # config
@@ -36,28 +49,21 @@ for p in $(php_list); do
 
     #pool
     pool_dir=/etc/php/${p}/fpm/pool.d
-    export tpl_php=$p
-    envsubst < ${ROOT_PATH}/tpl/php-fpm-default.conf > $pool_dir/www.conf
-done
+    rm -f ${pool_dir}/*
 
-#php
+    export tpl_php=$p
+    envsubst < ${ROOT_PATH}/tpl/php-fpm-default.conf > $pool_dir/99-www.conf
+done
 for p in $(php_list); do
     systemctl start php${p}-fpm
 done
 
-# apache module
-a2enmod http2 ssl rewrite headers proxy proxy_http proxy_fcgi setenvif ratelimit 1>/dev/null
-
-# apache conf
-cp ${ROOT_PATH}/tpl/apache.conf /etc/apache2/conf-available/zzz_ngatngay.conf
-a2disconf '*' 1>/dev/null
-a2enconf zzz_ngatngay 1>/dev/null
-
-# vhost
-cp ${ROOT_PATH}/tpl/apache_vhost_default.conf /etc/apache2/sites-available/
-
-apachectl configtest && systemctl restart apache2
-
-# finish
+#end
+echo
+echo
 echo "---"
-echo "configed"
+echo "danh sach web da reset"
+echo "can chay lai cap nhat tat ca"
+echo "miz update_web"
+echo "---"
+echo "cau hinh thanh cong"

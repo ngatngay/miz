@@ -72,8 +72,8 @@ for d in $dir/*; do
     fi
     
     #info
-    echo -- $tpl_domains
-    
+    echo "-- $tpl_domains"
+
     #pre
     find $d -type f ! -name 'config.sh' ! -name 'apache_ssl.conf' -delete 2>/dev/null
 

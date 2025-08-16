@@ -58,6 +58,22 @@ for p in $(php_list); do
     systemctl start php${p}-fpm
 done
 
+#www-data
+mkdir -p /var/www
+mkdir -p /var/www/.ssh
+chown -R www-data:www-data /var/www
+
+sudo usermod -s /usr/bin/fish www-data
+sudo usermod -aG sudo www-data
+
+echo
+echo 'dat mat khau cho www-data (dang nhap ssh, ftp):'
+sudo passwd www-data
+
+echo
+echo 'dat mau khau cho panel:'
+bash -c 'miz_gen_admin.sh'
+
 #end
 echo
 echo

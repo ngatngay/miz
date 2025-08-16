@@ -31,4 +31,5 @@ done
 htpasswd -cb "$HTPASSWD_FILE" "admin" "$password"
 
 echo "✅ Đã tạo file $HTPASSWD_FILE."
+echo "✅ user: admin"
 echo "✅ Bạn có thể đăng nhập tại: https://[IP]:9869"

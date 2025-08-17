@@ -3,8 +3,15 @@
 echo "config-ing..."
 
 # security system
-cptpl fail2ban.conf /etc/fail2ban/jail.local
-sudo systemctl restart fail2ban
+(
+    cd /tmp
+    git clone --depth 1 https://github.com/fail2ban/fail2ban.git
+
+    sudo cp -r fail2ban/config/* /etc/fail2ban/  
+    rm -rf /tmp/fail2ban
+    
+    sudo systemctl restart fail2ban
+)
 
 # log auto html
 cp -p ${ROOT_PATH}/miz_gen_weblog.sh /etc/cron.daily/miz_gen_weblog
@@ -58,10 +65,12 @@ for p in $(php_list); do
     systemctl start php${p}-fpm
 done
 
+echo
+bash -c 'miz update_web'
+
 #www-data
 mkdir -p /var/www
 mkdir -p /var/www/.ssh
-chown -R www-data:www-data /var/www
 
 sudo usermod -s /usr/bin/fish www-data
 sudo usermod -aG sudo www-data
@@ -74,12 +83,9 @@ echo
 echo 'dat mau khau cho panel:'
 bash -c 'miz_gen_admin.sh'
 
+bash -c 'miz fix'
+
 #end
 echo
-echo
-echo "---"
-echo "danh sach web da reset"
-echo "can chay lai cap nhat tat ca"
-echo "miz update_web"
 echo "---"
 echo "cau hinh thanh cong"

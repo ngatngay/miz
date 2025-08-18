@@ -2,14 +2,17 @@
 
 echo "config-ing..."
 
+HTPASSWD_FILE="/www/data/admin.htpasswd"
+
 # security system
 (
     cd /tmp
+    rm -rf fail2ban
     git clone --depth 1 https://github.com/fail2ban/fail2ban.git
 
     sudo cp -r fail2ban/config/* /etc/fail2ban/  
-    rm -rf /tmp/fail2ban
-    
+
+    cptpl fail2ban.conf /etc/fail2ban/jail.local
     sudo systemctl restart fail2ban
 )
 
@@ -67,6 +70,30 @@ done
 
 echo
 bash -c 'miz update_web'
+bash -c 'miz fix'
+
+# doi mat khau
+echo
+echo 'dat mat khau cho www-data (dang nhap ssh, ftp)'
+read -s -p "Nhập mật khẩu: " password
+echo
+read -s -p "Nhập lại mật khẩu: " password_confirm
+echo
+
+if [[ -z "$password" ]]; then
+    echo "❌ Mật khẩu không được để trống."
+    exit
+fi
+
+if [[ ${#password} -lt 8 ]]; then
+    echo "❌ Mật khẩu phải dài ít nhất 8 ký tự."
+    exit
+fi
+
+if [[ "$password" != "$password_confirm" ]]; then
+    echo "❌ Mật khẩu nhập lại không khớp."
+    exit
+fi
 
 #www-data
 mkdir -p /var/www
@@ -74,16 +101,14 @@ mkdir -p /var/www/.ssh
 
 sudo usermod -s /usr/bin/fish www-data
 sudo usermod -aG sudo www-data
+echo "www-data:$password" | sudo chpasswd
 
-echo
-echo 'dat mat khau cho www-data (dang nhap ssh, ftp):'
-sudo passwd www-data
+# Tạo file .htpasswd với user đầu tiên
+htpasswd -cb "$HTPASSWD_FILE" "admin" "$password"
 
-echo
-echo 'dat mau khau cho panel:'
-bash -c 'miz_gen_admin.sh'
-
-bash -c 'miz fix'
+echo "✅ Đã tạo file $HTPASSWD_FILE."
+echo "✅ user: admin"
+echo "✅ Bạn có thể đăng nhập tại: https://[IP]:9869"
 
 #end
 echo

@@ -9,7 +9,7 @@ fi
 
 # common tool
 apt-get update -y
-apt-get install -y sudo dos2unix cron logrotate goaccess neovim git fish restic tmux ssl-cert fail2ban software-properties-common vsftpd zoxide zip unzip
+apt-get install -y sudo dos2unix cron logrotate goaccess neovim git fish restic tmux ssl-cert fail2ban software-properties-common vsftpd supervisor jq zoxide zip unzip python3-full
 
 sudo update-alternatives --install /usr/bin/vi vi /usr/bin/nvim 60 && sudo update-alternatives --set vi /usr/bin/nvim
 
@@ -33,6 +33,61 @@ php_install 8.3
 php_install 8.4
 
 php_default 8.3
+
+# supervisor
+
+SUP_CONF_DIR="/www/data/supervisor"
+SYSTEMD_FILE="/etc/systemd/system/supervisord-www-data.service"
+
+mkdir -p /www/data/supervisor
+mkdir -p /www/data/supervisor/log
+mkdir -p /www/data/supervisor/conf.d
+
+# Tạo file systemd service
+cat > "$SYSTEMD_FILE" <<'EOF'
+[Unit]
+Description=Supervisor for www-data
+After=network.target
+
+[Service]
+Type=simple
+User=www-data
+Group=www-data
+ExecStart=/usr/bin/supervisord -n -c /www/data/supervisor/supervisord.conf
+Restart=on-failure
+KillMode=process
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+# Tạo file supervisord.conf cho www-data
+cat > "$SUP_CONF_DIR/supervisord.conf" <<'EOF'
+[supervisord]
+nodaemon=true
+logfile=/www/data/supervisor/supervisord.log
+childlogdir=/www/data/supervisor/log
+
+[unix_http_server]
+file=/www/data/supervisor/supervisor.sock
+chmod=0770
+chown=www-data:www-data
+
+[rpcinterface:supervisor]
+supervisor.rpcinterface_factory = supervisor.rpcinterface:make_main_rpcinterface
+
+[supervisorctl]
+serverurl=unix:///www/data/supervisor/supervisor.sock
+
+[include]
+files=/www/data/supervisor/conf.d/*.conf
+EOF
+
+chown -R www-data:www-data /www/data
+systemctl daemon-reload
+systemctl enable supervisord-www-data
+systemctl stop supervisord-www-data
+systemctl start supervisord-www-data
 
 # ssl - cerbot
 if ! cmd_exists certbot; then

@@ -103,7 +103,8 @@ for d in $dir/*; do
             ssl_failed=0
 
             c_args=()
-            for c_domain in $tpl_domains; do
+            IFS=' ' read -ra c_domains <<< "$tpl_domains"
+            for c_domain in "${c_domains[@]}"; do
                 c_args+=(-d "$c_domain")
             done
             

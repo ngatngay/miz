@@ -104,9 +104,16 @@ else
 fi
 
 # memcached
-if ! cmd_exists memcached; then
+memcached_version="1.6.39"
+memcached_current_version=""
+
+if cmd_exists memcached; then
+    memcached_current_version=$(memcached -V | awk '{print $2}')
+fi
+
+if [ "$memcached_current_version" != "$memcached_version" ]; then
 (
-    version="1.6.38"
+    version="$memcached_version"
     
     apt-get install build-essential autotools-dev automake libevent-dev
     

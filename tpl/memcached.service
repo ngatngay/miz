@@ -3,7 +3,7 @@ Description=memcached daemon
 After=network.target
 
 [Service]
-ExecStart=/usr/local/bin/memcached -p ${PORT} -u ${USER} -m ${CACHESIZE} -c ${MAXCONN} $OPTIONS
+ExecStart=/usr/local/bin/memcached -p ${PORT} -u ${USER} -m ${CACHESIZE} -c ${MAXCONN} -l 127.0.0.1 $OPTIONS
 
 PrivateTmp=true
 ProtectSystem=full

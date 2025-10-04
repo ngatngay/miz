@@ -1,27 +1,23 @@
-echo "===> Đang kiểm tra các dịch vụ tường lửa xung đột..."
-
-FW_SERVICES=("iptables" "ufw" "firewalld")
-
-for fw in "${FW_SERVICES[@]}"; do
-    sudo systemctl stop "$fw" 2>/dev/null || true
-    sudo systemctl disable "$fw" 2>/dev/null || true
-done
-
-echo "===> Gỡ các gói: ${FIREWALL_SERVICES[*]}"
-sudo apt remove --purge -y "${FW_SERVICES[@]}"
-sudo apt autoremove -y
-
-echo "===> Đã hoàn tất."
-
-echo 'install nftables'
-
-apt update 1>/dev/null
-apt install nftables 1>/dev/null
+echo 'CÁC thao tác với firewall RẤT NGUY HIỂM, có thể khiến VPS không thể truy cập trong thời gian ngắn!'
+echo
+echo '[Enter] để tiếp tục.'
+read
 
 sudo systemctl enable nftables
 sudo systemctl start nftables
 
 cptpl nftables.conf /etc/nftables.conf
-nft -f /etc/nftables.conf
 
-echo 'done'
+nft -c -f /etc/nftables.conf && sudo systemctl restart nftables
+
+echo 'Firewall đã thiết lập xong.'
+
+echo
+echo 'Ấn Enter để xác nhận RESTART Docker.'
+echo '- Không restart docker sẽ không dùng được các cổng public'
+echo 'Nhấn Ctrl+C để HỦY!'
+read  # chờ người dùng nhấn Enter
+
+sudo systemctl restart docker
+
+echo 'Hoàn thành restart Docker!'

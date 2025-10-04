@@ -41,6 +41,16 @@ rpct() {
   sed -i -e "/$pat/ r $insert_file" -e "/$pat/ d" "$target_file"
 }
 
+#!/bin/bash
+
+domain_load_conf() {
+    local json_file="$1"
+    jq -r 'to_entries[] | "\(.key)=\(.value|tostring)"' "$json_file" | while IFS="=" read -r key value; do
+        var_name="tpl_${key}"
+        export "$var_name=$value"
+    done
+}
+
 domain_valid() {
     local domain="$1"
     local regex="^([a-zA-Z0-9][-a-zA-Z0-9]*\.)+[a-zA-Z]{2,}$"

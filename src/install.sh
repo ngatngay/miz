@@ -124,8 +124,10 @@ if [ "$memcached_current_version" != "$memcached_version" ]; then
     cd memcached-${version}
     
     ./configure && make && sudo make install
-    
-    # service
+)
+fi
+(
+    # memcached service
     export PORT=11211
     export USER=www-data
     export CACHESIZE=1024
@@ -136,13 +138,11 @@ if [ "$memcached_current_version" != "$memcached_version" ]; then
     
     sudo systemctl daemon-reload
     sudo systemctl enable memcached
-    sudo systemctl start memcached
+    sudo systemctl restart memcached
     
     efw =
-    echo installed memcached-${version}
     memcached --version
 )
-fi
 
 echo 1 > $INSTALLED_FILE
 

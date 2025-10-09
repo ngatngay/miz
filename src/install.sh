@@ -14,12 +14,12 @@ apt-get install -y sudo dos2unix cron logrotate goaccess neovim git fish restic 
 sudo update-alternatives --install /usr/bin/vi vi /usr/bin/nvim 60 && sudo update-alternatives --set vi /usr/bin/nvim
 
 # mariadb 10.11
-apt-get install mariadb-server
+apt-get install -y mariadb-server
 
 # apache
 add-apt-repository -y ppa:ondrej/apache2
 
-apt-get install apache2
+apt-get install -y apache2
 
 # php
 add-apt-repository -y ppa:ondrej/php
@@ -91,7 +91,7 @@ systemctl start supervisord-www-data
 
 # ssl - cerbot
 if ! cmd_exists certbot; then
-    sudo apt install python3 python3-venv libaugeas-dev
+    sudo apt install -y python3 python3-venv libaugeas-dev
 
     sudo python3 -m venv /opt/certbot/
     sudo /opt/certbot/bin/pip install --upgrade pip
@@ -115,7 +115,7 @@ if [ "$memcached_current_version" != "$memcached_version" ]; then
 (
     version="$memcached_version"
     
-    apt-get install build-essential autotools-dev automake libevent-dev
+    apt-get install -y build-essential autotools-dev automake libevent-dev
     
     cd /opt/
     curl -L -o memcached-${version}.tar.gz https://memcached.org/files/memcached-${version}.tar.gz

@@ -39,6 +39,7 @@ PATTERNS=(
 )
 
 declare -A KEEP
+
 for d in "$DATA_DIR"/*/ "$DATA_DIR"/*; do
   [[ -d "$d" ]] || continue
   domain="${d%/}"
@@ -46,7 +47,7 @@ for d in "$DATA_DIR"/*/ "$DATA_DIR"/*; do
   [[ -n "$domain" ]] && KEEP["$domain"]=1
 done
 
-if [[ ${#KEEP[@]} -gt 0 ]]; then
+if (( ${#KEEP[@]:-0} > 0 )); then
   for pat in "${PATTERNS[@]}"; do
     for f in $pat; do
       name="${f##*/}"        # ví dụ: 9-example.com.conf

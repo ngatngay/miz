@@ -10,7 +10,7 @@
 
 ## yêu cầu
 
-- Debian 11
+- Ubuntu 24.04 LTS
 
 ## install
 

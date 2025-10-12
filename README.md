@@ -1,7 +1,7 @@
 ## tính năng
 
 - Apache 2.4
-- MariaDB 11.4
+- MariaDB 10.11
 - PHP
     - composer
     - wp cli

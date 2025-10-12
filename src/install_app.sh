@@ -4,7 +4,7 @@ if [ ! -d '/www/app/file-manager' ]; then
     mkdir file-manager
     cd file-manager
 
-    curl -L -o file-manager.zip https://github.com/ngatngay/file-manager/releases/latest/download/release.zip
+    curl -L -o file-manager.zip https://github.com/linh0804/file-manager/releases/latest/download/release.zip
     unzip file-manager.zip
 fi
 

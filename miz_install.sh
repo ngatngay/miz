@@ -2,11 +2,12 @@
 set -euo pipefail
 
 apt-get update -y > /dev/null
-apt-get install fish git -y > /dev/null
+apt-get install -y fish git tmux > /dev/null
 
 mkdir -p /www
 mkdir -p /www/app
 mkdir -p /www/data
+mkdir -p /www/data/domain
 mkdir -p /www/tool
 mkdir -p /www/log
 mkdir -p /www/log/apache

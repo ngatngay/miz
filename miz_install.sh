@@ -19,6 +19,7 @@ if [ ! -d '/www/miz' ]; then
     git clone --depth 1 https://github.com/ngatngay/miz
 fi
 
+git config --global --add safe.directory /www/miz
 # add PATH
 
 # for bash

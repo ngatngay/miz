@@ -1,36 +1,26 @@
+#!/usr/bin/env bash
+set -e
+
 cd /www/app
 
-if [ ! -d '/www/app/file-manager' ]; then
-    mkdir file-manager
-    cd file-manager
+# ==== file-manager ====
+mkdir -p file-manager
+tmp_fm="/tmp/file-manager.zip"
+curl -L -o "$tmp_fm" "https://static.ngatngay.net/php/file-manager/release.zip"
+unzip -o "$tmp_fm" -d "file-manager"
 
-    curl -L -o file-manager.zip https://github.com/linh0804/file-manager/releases/latest/download/release.zip
-    unzip file-manager.zip
-fi
+# ==== phpMyAdmin ====
+PMA_VERSION="5.2.2"
+PMA_NAME="phpMyAdmin-${PMA_VERSION}-english"
+PMA_LINK="https://files.phpmyadmin.net/phpMyAdmin/${PMA_VERSION}/${PMA_NAME}.zip"
 
-if [ ! -d '/www/app/phpmyadmin' ]; then
-    PMA_VERSION="5.2.2"
-    PMA_NAME="phpMyAdmin-${PMA_VERSION}-english"
-    PMA_LINK="https://files.phpmyadmin.net/phpMyAdmin/${PMA_VERSION}/${PMA_NAME}.zip"
-    
-    curl -O -L $PMA_LINK
-    unzip "${PMA_NAME}.zip"
-    mv $PMA_NAME phpmyadmin
-    rm "${PMA_NAME}.zip"
-fi
+mkdir -p phpmyadmin
+tmp_pma_zip="/tmp/phpmyadmin.zip"
+tmp_pma_dir="/tmp/pma_extract"
 
-exit
-
-ip=$(curl -s ipinfo.io/ip)
-while true; do
-    port=$(( RANDOM % 64512 + 1024 ))
-    if ! ss -tuln | grep -q ":$port\b"; then
-        break
-    fi
-done
-
-echo "http://$ip:$port"
-efw =
-
-cd /www/app/file-manager
-PHP_CLI_SERVER_WORKERS=4 php -S 0.0.0.0:$port
+curl -L -o "$tmp_pma_zip" "$PMA_LINK"
+rm -rf "$tmp_pma_dir"
+mkdir -p "$tmp_pma_dir"
+unzip -o "$tmp_pma_zip" -d "$tmp_pma_dir"
+# chép đè nội dung vào thư mục hiện có
+cp -a "$tmp_pma_dir/$PMA_NAME/." "phpmyadmin/"

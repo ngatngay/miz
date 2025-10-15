@@ -1,26 +1,30 @@
 #!/usr/bin/env bash
 set -e
 
-cd /www/app
+app_dir="/www/app"
+cd "$app_dir"
 
 # ==== file-manager ====
-mkdir -p file-manager
-tmp_fm="/tmp/file-manager.zip"
-curl -L -o "$tmp_fm" "https://static.ngatngay.net/php/file-manager/release.zip"
-unzip -o "$tmp_fm" -d "file-manager"
+fm_dir="$app_dir/file-manager"
+fm_tmp="/tmp/file-manager.zip"
+fm_src="https://static.ngatngay.net/php/file-manager/release.zip"
+
+mkdir -p "$fm_dir"
+curl -L -o "$fm_tmp" "$fm_src"
+unzip -o "$fm_tmp" -d "$fm_dir"
 
 # ==== phpMyAdmin ====
-PMA_VERSION="5.2.2"
-PMA_NAME="phpMyAdmin-${PMA_VERSION}-english"
-PMA_LINK="https://files.phpmyadmin.net/phpMyAdmin/${PMA_VERSION}/${PMA_NAME}.zip"
+pma_version="5.2.2"
+pma_name="phpMyAdmin-${pma_version}-english"
+pma_link="https://files.phpmyadmin.net/phpMyAdmin/${pma_version}/${pma_name}.zip"
 
-mkdir -p phpmyadmin
-tmp_pma_zip="/tmp/phpmyadmin.zip"
-tmp_pma_dir="/tmp/pma_extract"
+pma_dir="$app_dir/phpmyadmin"
+pma_zip_tmp="/tmp/phpmyadmin.zip"
+pma_extract_tmp="/tmp/pma_extract"
 
-curl -L -o "$tmp_pma_zip" "$PMA_LINK"
-rm -rf "$tmp_pma_dir"
-mkdir -p "$tmp_pma_dir"
-unzip -o "$tmp_pma_zip" -d "$tmp_pma_dir"
-# chép đè nội dung vào thư mục hiện có
-cp -a "$tmp_pma_dir/$PMA_NAME/." "phpmyadmin/"
+mkdir -p "$pma_dir"
+curl -L -o "$pma_zip_tmp" "$pma_link"
+rm -rf "$pma_extract_tmp"
+mkdir -p "$pma_extract_tmp"
+unzip -o "$pma_zip_tmp" -d "$pma_extract_tmp"
+cp -a "$pma_extract_tmp/$pma_name/." "$pma_dir/"

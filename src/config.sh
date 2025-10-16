@@ -37,12 +37,12 @@ systemctl restart vsftpd
 # apache
 a2enmod http2 ssl rewrite headers proxy proxy_http proxy_fcgi setenvif ratelimit 1>/dev/null
 
-cp ${ROOT_PATH}/tpl/apache.conf /etc/apache2/conf-available/99-ngatngay.conf
+cp ${ROOT_PATH}/tpl/apache.conf /etc/apache2/conf-available/0-ngatngay.conf
 a2disconf '*' 1>/dev/null
-a2enconf 99-ngatngay 1>/dev/null
+a2enconf 0-ngatngay 1>/dev/null
 
 rm -f /etc/apache2/sites-available/*
-cptpl apache_vhost_default.conf /etc/apache2/sites-available/99-ngatngay.conf
+cptpl apache_vhost_default.conf /etc/apache2/sites-available/0-ngatngay.conf
 
 a2dissite '*' >/dev/null
 a2ensite '*' >/dev/null
@@ -54,22 +54,22 @@ for p in $(php_list); do
     systemctl stop php${p}-fpm
 
     # config
-    cptpl php-cli.ini /etc/php/${p}/cli/conf.d/99-ngatngay.ini
-    cptpl php.ini /etc/php/${p}/fpm/conf.d/99-ngatngay.ini
+    cptpl php-cli.ini /etc/php/${p}/cli/conf.d/0-ngatngay.ini
+    cptpl php.ini /etc/php/${p}/fpm/conf.d/0-ngatngay.ini
 
     #pool
     pool_dir=/etc/php/${p}/fpm/pool.d
     rm -f ${pool_dir}/*
 
     export tpl_php=$p
-    envsubst < ${ROOT_PATH}/tpl/php-fpm-default.conf > $pool_dir/99-www.conf
+    envsubst < ${ROOT_PATH}/tpl/php-fpm-default.conf > $pool_dir/0-www.conf
 done
 for p in $(php_list); do
     systemctl start php${p}-fpm
 done
 
 echo
-bash -c 'miz update_web'
+bash -c 'php /www/miz/src/update_web.php'
 bash -c 'miz fix'
 
 # doi mat khau

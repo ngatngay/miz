@@ -4,7 +4,7 @@ defined('ACCESS') or exit('Not access');
 
 @ini_set('display_errors', true);
 @ini_set('memory_limit', '64M');
-@ini_set('max_execution_time', 60);
+@ini_set('max_execution_time', 300);
 @ini_set('opcache.revalidate_freq', 0);
 
 error_reporting(-1);
@@ -80,4 +80,48 @@ function domain_config_tpl() {
 
 function e($str) {
     return htmlspecialchars($str);
+}
+
+function get_tpl(string $name): string {
+    $paths = [
+        '/www/data/tpl/',
+        '/www/miz/tpl/'
+    ];
+
+    foreach ($paths as $path) {
+        $file = $path . $name;
+
+        if (is_file($file)) {
+            return file_get_contents($file);
+        }
+    }
+
+    return '';
+}
+
+function gen_tpl(string $name, array $data): string {
+    $content = get_tpl($name);
+
+    foreach ($data as $key => $value) {
+        if (is_string($value) || is_numeric($value)) {
+            $content = str_replace('{{ $' . $key . ' }}', $value, $content);
+        }
+    }
+    
+    return $content;
+}
+
+function tpl_replace_block(string $content, string $name, string $replace): string {
+    $pattern = '/(#' . preg_quote($name, '/') . '_start)(.*?)(#' . preg_quote($name, '/') . '_end)/s';
+    return preg_replace($pattern, "$1\n" . $replace . "\n$3", $content);
+}
+
+function get_tpl_domain(string $id, string $name): string {
+    $file = '/www/data/domain/' . $id . '/' . $name;
+    return is_file($file) ? file_get_contents($file) : '';
+}
+
+function put_tpl_domain(string $id, string $name, string $content): void {
+    $file = '/www/data/domain/' . $id . '/' . $name;
+    file_put_contents($file, $content);
 }

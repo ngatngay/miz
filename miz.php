@@ -15,6 +15,22 @@ define('panel_path', '/www/miz/panel');
 define('data_path', '/www/data');
 define('web_path', '/www/web');
 
+if (php_sapi_name() === 'cli') {
+// Kiểm tra user root
+$is_root = false;
+
+if (function_exists('posix_geteuid')) {
+    $is_root = posix_geteuid() === 0;
+} else {
+    $user = getenv('USER') ?: getenv('USERNAME');
+    $is_root = ($user === 'root');
+}
+
+if (!$is_root) {
+    die("Chỉ user root mới được phép chạy.\n");
+}
+}
+
 function gen_uuid(): string {
     usleep(5000);
     $time = (int) (microtime(true) * 1000);
@@ -73,8 +89,12 @@ function domain_config_tpl() {
     return [
         'domains' => '',
         'status' => 'on', // on/off
+        'mode' => 'static',
         'dir' => '',
-        'php' => '0' // 0 - disable/5.6/7.4
+        'php' => '0', // 0 - disable/5.6/7.4
+        'proxy_uri' => '"/" "http://localhost:8080/"',
+        'apache_custom_global' => '',
+        'apache_custom' => ''
     ];
 }
 

@@ -3,13 +3,12 @@ if installed; then
     echo "script installed, only update"
     
     # confirm update 
-    
     echo "---"
 fi
 
 # common tool
 apt-get update -y
-apt-get install -y sudo dos2unix cron logrotate goaccess neovim git fish restic tmux ssl-cert fail2ban software-properties-common vsftpd supervisor jq zoxide zip unzip python3-full
+apt-get install -y sudo dos2unix cron logrotate goaccess neovim git fish restic tmux ssl-cert fail2ban software-properties-common vsftpd jq zoxide zip unzip python3-full
 
 sudo update-alternatives --install /usr/bin/vi vi /usr/bin/nvim 60 && sudo update-alternatives --set vi /usr/bin/nvim
 
@@ -33,61 +32,6 @@ php_install 8.3
 php_install 8.4
 
 php_default 8.3
-
-# supervisor
-
-SUP_CONF_DIR="/www/data/supervisor"
-SYSTEMD_FILE="/etc/systemd/system/supervisord-www-data.service"
-
-mkdir -p /www/data/supervisor
-mkdir -p /www/data/supervisor/log
-mkdir -p /www/data/supervisor/conf.d
-
-# Tạo file systemd service
-cat > "$SYSTEMD_FILE" <<'EOF'
-[Unit]
-Description=Supervisor for www-data
-After=network.target
-
-[Service]
-Type=simple
-User=www-data
-Group=www-data
-ExecStart=/usr/bin/supervisord -n -c /www/data/supervisor/supervisord.conf
-Restart=on-failure
-KillMode=process
-
-[Install]
-WantedBy=multi-user.target
-EOF
-
-# Tạo file supervisord.conf cho www-data
-cat > "$SUP_CONF_DIR/supervisord.conf" <<'EOF'
-[supervisord]
-nodaemon=true
-logfile=/www/data/supervisor/supervisord.log
-childlogdir=/www/data/supervisor/log
-
-[unix_http_server]
-file=/www/data/supervisor/supervisor.sock
-chmod=0770
-chown=www-data:www-data
-
-[rpcinterface:supervisor]
-supervisor.rpcinterface_factory = supervisor.rpcinterface:make_main_rpcinterface
-
-[supervisorctl]
-serverurl=unix:///www/data/supervisor/supervisor.sock
-
-[include]
-files=/www/data/supervisor/conf.d/*.conf
-EOF
-
-chown -R www-data:www-data /www/data
-systemctl daemon-reload
-systemctl enable supervisord-www-data
-systemctl stop supervisord-www-data
-systemctl start supervisord-www-data
 
 # ssl - cerbot
 if ! cmd_exists certbot; then
@@ -143,6 +87,72 @@ fi
     efw =
     memcached --version
 )
+
+#nodejs
+curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+sudo apt-get install -y nodejs
+node -v
+
+npm install --global corepack
+corepack enable pnpm
+
+npm install -g \
+    npm-check-updates \
+    pm2 \
+    nodemon
+
+pm2 install pm2-logrotate
+#nodejs end
+
+echo 'install app'
+(
+    app_dir="/www/app"
+    cd "$app_dir"
+    
+    # ==== file-manager ====
+    fm_dir="$app_dir/file-manager"
+    fm_tmp="/tmp/file-manager.zip"
+    fm_src="https://static.ngatngay.net/php/file-manager/release.zip"
+    
+    mkdir -p "$fm_dir"
+    curl -L -o "$fm_tmp" "$fm_src"
+    unzip -o "$fm_tmp" -d "$fm_dir"
+    
+    # ==== phpMyAdmin ====
+    pma_version="5.2.2"
+    pma_name="phpMyAdmin-${pma_version}-english"
+    pma_link="https://files.phpmyadmin.net/phpMyAdmin/${pma_version}/${pma_name}.zip"
+    
+    pma_dir="$app_dir/phpmyadmin"
+    pma_zip_tmp="/tmp/phpmyadmin.zip"
+    pma_extract_tmp="/tmp/pma_extract"
+    
+    mkdir -p "$pma_dir"
+    curl -L -o "$pma_zip_tmp" "$pma_link"
+    rm -rf "$pma_extract_tmp"
+    mkdir -p "$pma_extract_tmp"
+    unzip -o "$pma_zip_tmp" -d "$pma_extract_tmp"
+    cp -a "$pma_extract_tmp/$pma_name/." "$pma_dir/"
+)
+
+echo 'install tool'
+(
+    cd /www/tool
+    
+    curl -o composer -L https://getcomposer.org/download/latest-stable/composer.phar
+    chmod +x composer
+    
+    curl -o phpstan -L https://github.com/phpstan/phpstan/releases/latest/download/phpstan.phar
+    chmod +x phpstan
+    
+    curl -o php-cs-fixer -L https://github.com/PHP-CS-Fixer/PHP-CS-Fixer/releases/latest/download/php-cs-fixer.phar
+    chmod +x php-cs-fixer
+    
+    curl -o wp -L https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
+    chmod +x wp
+)
+
+bash -c 'miz fix'
 
 echo 1 > $INSTALLED_FILE
 

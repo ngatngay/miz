@@ -80,33 +80,36 @@ php_list() {
 }
 
 php_install() {
-    local version="$1"
-
-    if [[ -z "$version" ]]; then
-        echo "Usage: install_php <php_version>"
+    if [[ $# -eq 0 ]]; then
+        echo "Usage: php_install <php_version> [more_versions...]"
         return 1
     fi
 
-    local packages=(
-        "php${version}"
-        "php${version}-apcu"
-        "php${version}-bcmath"
-        "php${version}-memcached"
-        "php${version}-redis"
-        "php${version}-cli"
-        "php${version}-curl"
-        "php${version}-fpm"
-        "php${version}-intl"
-        "php${version}-gd"
-        "php${version}-mbstring"
-        "php${version}-mysql"
-        "php${version}-sqlite3"
-        "php${version}-xml"
-        "php${version}-zip"
-    )
-    
-    sudo apt-get update > /dev/null
-    sudo apt install -y "${packages[@]}"
+    local all_packages=()
+
+    for version in "$@"; do
+        all_packages+=(
+            "php${version}"
+            "php${version}-apcu"
+            "php${version}-bcmath"
+            "php${version}-memcached"
+            "php${version}-redis"
+            "php${version}-cli"
+            "php${version}-curl"
+            "php${version}-fpm"
+            "php${version}-intl"
+            "php${version}-gd"
+            "php${version}-mbstring"
+            "php${version}-mysql"
+            "php${version}-sqlite3"
+            "php${version}-xml"
+            "php${version}-zip"
+        )
+    done
+
+    sudo apt-get update -qq
+    echo "Installing PHP versions: $*"
+    sudo apt-get install -y "${all_packages[@]}"
 }
 
 php_default() {

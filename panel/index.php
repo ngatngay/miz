@@ -36,7 +36,9 @@ require 'header.php';
                     <?php
                 } ?>
             </div>
-            <span><i class="layui-icon layui-icon-tips-fill layui-font-12"></i> php <?= e((string) ($domain_config['php'] ?? '')) ?></span>
+            <span class="layui-btn layui-btn-xs <?= $domain_config['status'] === 'on' ? '' : 'layui-bg-red' ?>"><?= $domain_config['status'] ?></span>
+            <span class="layui-btn layui-btn-xs layui-btn-primary layui-border-green"><?= $domain_config['mode'] ?></span>
+            <br><span><i class="layui-icon layui-icon-tips-fill layui-font-12"></i> php <?= e((string) ($domain_config['php'] ?? '')) ?></span>
             <br><span><i class="layui-icon layui-icon-folder layui-font-12"></i> <?= e((string) ($domain_config['dir'] ?? '')) ?></span>
             <hr>
             <div class="layui-btn-container">

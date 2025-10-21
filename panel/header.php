@@ -13,9 +13,6 @@ $site_head = isset($site_head) ? $site_head : '';
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="none">
 
-<script src="//cdn.jsdelivr.net/npm/eruda"></script>
-<script>eruda.init();</script>
-
     <link href="https://static.ngatngay.net/js/layui/css/layui.css" rel="stylesheet" />
     <script src="https://static.ngatngay.net/js/layui/layui.js"></script>
     <script src="https://static.ngatngay.net/js/layui/nightmare.layui.table.js"></script>

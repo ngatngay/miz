@@ -12,10 +12,10 @@
 
 - Ubuntu 24.04 LTS
 
-## install
+## cài đặt (for root)
 
 ```
-curl -Ls https://raw.githubusercontent.com/ngatngay/miz/refs/heads/main/miz_install.sh | bash
+curl -Ls https://raw.githubusercontent.com/ngatngay/miz/refs/heads/main/install.sh | bash
 ```
 
 ## panel

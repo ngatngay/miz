@@ -1,7 +1,7 @@
 status is-interactive || exit
 
 if test (id -u) -eq 0
-    set -gx PATH /www/miz $PATH
+    set -gx PATH /www/miz/bin $PATH
 end
 
 set -gx PATH /www/tool $PATH

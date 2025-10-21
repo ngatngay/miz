@@ -31,7 +31,6 @@ if (empty($update_domain)) {
     passthru('mkdir -p /www/data/domain');
     passthru("a2dissite '9-*' >/dev/null 2>&1");
 
-
     // xoá config cũ
     $current_confs = array_merge(
         glob('/etc/php/*/fpm/pool.d/9-*.conf'),
@@ -103,11 +102,41 @@ foreach ($domains as $domain_id => $domain) {
     // apache ssl
      $apache_tpl = tpl_replace_block($apache_tpl, 'ssl', $c_content);
 
+    // apache dir
+    if (empty($domain['dir'])) {
+        $apache_tpl = tpl_replace_block($apache_tpl, 'rootdir', '');
+    }
+
     // apache php
     if (empty($domain['php'])) {
         $apache_tpl = tpl_replace_block($apache_tpl, 'php', '');
     }
+    
+    // mode
+    $mode_tpl = [];
+    if ($domain['mode'] === 'proxy') {
+        $apache_tpl = tpl_replace_block($apache_tpl, 'xsendfile', '');
+        $apache_tpl = tpl_replace_block($apache_tpl, 'php', '');
 
+        $mode_tpl[] = 'ProxyPreserveHost On';
+        
+        foreach (explode("\n", $domain['proxy_uri']) as $p_uri) {
+            $p_uri = trim($p_uri);
+            
+            if (empty($p_uri)) {
+                continue;
+            }
+            
+            $mode_tpl[] = 'ProxyPass ' . $p_uri;
+            $mode_tpl[] = 'ProxyPassReverse ' . $p_uri;
+        }
+    }
+    $apache_tpl = tpl_replace_block($apache_tpl, 'mode', implode("\n", $mode_tpl));
+
+    // extra
+    if (!empty($domain['apache_custom_global'])) {
+        $apache_tpl = tpl_replace_block($apache_tpl, 'extra', $domain['apache_custom_global']);
+    }
     file_put_contents($domain_conf_path . '/apache.conf', $apache_tpl);
 
     copy("$domain_conf_path/apache.conf", '/etc/apache2/sites-available/9-' . $domain['domain'] . '.conf');
@@ -137,6 +166,7 @@ foreach ($domains as $domain_id => $domain) {
 }
 
 // end
+//exit;
 
 $versions = ['5.6', '7.4', '8.0', '8.1', '8.2', '8.3', '8.4'];
 foreach ($versions as $v) {

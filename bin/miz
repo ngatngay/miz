@@ -2,7 +2,7 @@
 set -euo pipefail
 
 ROOT_PATH=/www/miz
-source $ROOT_PATH/miz.sh
+source /www/miz/miz.sh
 
 MENU_OPTIONS=()
 
@@ -42,9 +42,7 @@ else
     choice=$((choice - 1))
     
     # Xử lý lựa chọn
-    if [[ $choice -ge 0 && $choice -lt ${#MENU_OPTIONS[@]} ]]; then
-        clear
-    
+    if [[ $choice -ge 0 && $choice -lt ${#MENU_OPTIONS[@]} ]]; then    
         action="${MENU_OPTIONS[choice]}"
         source $ROOT_PATH/src/$action.sh
     else

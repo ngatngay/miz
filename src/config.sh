@@ -17,7 +17,11 @@ HTPASSWD_FILE="/www/data/admin.htpasswd"
 )
 
 # log auto html
-cp -p ${ROOT_PATH}/miz_gen_weblog.sh /etc/cron.daily/miz_gen_weblog
+cat > /etc/cron.daily/miz_gen_weblog <<'EOF'
+#!/bin/sh
+sh /www/miz/miz_gen_weblog.sh &
+EOF
+chmod +x /etc/cron.daily/miz_gen_weblog
 
 # log system limit
 cp ${ROOT_PATH}/tpl/systemd-journald.conf /etc/systemd/journald.conf
@@ -27,7 +31,7 @@ systemctl restart systemd-journald
 cptpl logrotate.apache.conf /etc/logrotate.d/miz_apache
 
 #ssl
-echo -e "#!/bin/bash\ncertbot renew --quiet" | sudo tee /etc/cron.daily/certbot-renew > /dev/null
+echo -e "#!/bin/sh\ncertbot renew --quiet" | sudo tee /etc/cron.daily/certbot-renew > /dev/null
 sudo chmod +x /etc/cron.daily/certbot-renew
 
 #ftp

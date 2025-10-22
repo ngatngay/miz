@@ -89,7 +89,7 @@ function domain_config_tpl() {
     return [
         'domains' => '',
         'status' => 'on', // on/off
-        'mode' => 'static',
+        'mode' => 'php',
         'dir' => '',
         'php' => '0', // 0 - disable/5.6/7.4
         'proxy_uri' => '"/" "http://localhost:8080/"',

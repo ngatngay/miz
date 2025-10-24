@@ -13,8 +13,8 @@ fi
 
 git config --global --add safe.directory /www/miz
 
-# add PATH
-cp /www/miz/tpl/fish /etc/fish/conf.d/miz.fish
+# init shell
+sudo cp -r /www/miz/tpl/fish/* /etc/fish/
 chsh -s /usr/bin/fish root
 
 echo 'installed /www/miz'

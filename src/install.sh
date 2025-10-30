@@ -8,7 +8,7 @@ fi
 
 # common tool
 apt-get update -y
-apt-get install -y sudo dos2unix cron logrotate goaccess neovim git fish restic tmux ssl-cert fail2ban software-properties-common vsftpd jq zoxide zip unzip python3-full
+apt-get install -y sudo dos2unix cron logrotate goaccess neovim git fish restic tmux ssl-cert fail2ban software-properties-common vsftpd jq zoxide zip unzip python3-full python-is-python3
 
 sudo update-alternatives --install /usr/bin/vi vi /usr/bin/nvim 60 && sudo update-alternatives --set vi /usr/bin/nvim
 
@@ -17,20 +17,11 @@ apt-get install -y mariadb-server
 
 # apache
 add-apt-repository -y ppa:ondrej/apache2
-
 apt-get install -y apache2
 
 # php
 add-apt-repository -y ppa:ondrej/php
-
-php_install 5.6
-php_install 7.4
-php_install 8.0
-php_install 8.1
-php_install 8.2
-php_install 8.3
-php_install 8.4
-
+php_install 5.6 7.4 8.0 8.1 8.2 8.3 8.4
 php_default 8.3
 
 # ssl - cerbot
@@ -119,7 +110,7 @@ echo 'install app'
     unzip -o "$fm_tmp" -d "$fm_dir"
     
     # ==== phpMyAdmin ====
-    pma_version="5.2.2"
+    pma_version="5.2.3"
     pma_name="phpMyAdmin-${pma_version}-english"
     pma_link="https://files.phpmyadmin.net/phpMyAdmin/${pma_version}/${pma_name}.zip"
     

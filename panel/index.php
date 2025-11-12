@@ -2,11 +2,11 @@
 
 define('ACCESS', true);
 
-require __DIR__ . '/../miz.php';
+require __DIR__ . '/_init.php';
 
 $site_title = 'domain list';
 
-require 'header.php';
+require '_header.php';
 
 ?>
 
@@ -60,4 +60,4 @@ var id = location.hash.substring(1);
 if (id) $('#' + id).css('border-color', '#ff5722');
 </script>
 
-<?php require 'footer.php'; ?>
+<?php require '_footer.php'; ?>

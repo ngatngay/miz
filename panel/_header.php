@@ -39,11 +39,11 @@ var $ = layui.$;
 <div class="title"><a href="/">Home</a></div>
 
 <div class="content">
-    &bull; <a href="/file-manager">file manager</a>
+    &bull; <a href="/file-manager/">file manager</a>
     <hr>
-    &bull; <a href="/phpmyadmin">phpmyadmin</a>
+    &bull; <a href="/phpmyadmin/">phpmyadmin</a>
     <hr>
-    &bull; <a href="/log_html">logs</a>
+    &bull; <a href="/log-html/">logs</a>
     <hr>
     &bull; <a href="/server-status">status</a>
 </div>

@@ -10,6 +10,10 @@ if type -q zoxide
     zoxide init fish | source
 end
 
+if type -q direnv
+    direnv hook fish | source
+end
+
 function fish_prompt
     set -l last_status $status
     set_color brgreen

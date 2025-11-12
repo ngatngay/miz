@@ -2,7 +2,7 @@
 
 define('ACCESS', true);
 
-require __DIR__ . '/../miz.php';
+require __DIR__ . '/_init.php';
 
 $domains = domains_load();
 $id = (string) ($_GET['id'] ?? '');
@@ -16,7 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 $site_title = 'xoá domain';
 
-require 'header.php';
+require '_header.php';
 
 ?>
 
@@ -44,4 +44,4 @@ require 'header.php';
 
 <?php
 
-require 'footer.php';
+require '_footer.php';

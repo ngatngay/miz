@@ -8,7 +8,7 @@ fi
 
 # common tool
 apt-get update -y
-apt-get install -y sudo dos2unix cron logrotate goaccess neovim git fish restic tmux ssl-cert fail2ban software-properties-common vsftpd jq zoxide zip unzip direnv python3-full python-is-python3
+apt-get install -y sudo dos2unix cron logrotate goaccess neovim git fish restic tmux ssl-cert fail2ban software-properties-common vsftpd jq zoxide zip unzip direnv python3-pip python3-full python-is-python3
 
 sudo update-alternatives --install /usr/bin/vi vi /usr/bin/nvim 60 && sudo update-alternatives --set vi /usr/bin/nvim
 

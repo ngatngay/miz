@@ -2,6 +2,9 @@
 
 echo "config-ing..."
 
+# ulimit
+curl -fsSL https://static.ngatngay.net/linux/ulimit_nofile.sh | bash
+
 HTPASSWD_FILE="/www/data/admin.htpasswd"
 
 # security system
@@ -39,14 +42,15 @@ cptpl vsftpd.conf /etc/vsftpd.conf
 systemctl restart vsftpd
 
 # apache
-a2enmod http2 ssl rewrite headers proxy proxy_http proxy_fcgi setenvif ratelimit 1>/dev/null
+a2enmod http2 ssl rewrite headers proxy proxy_http proxy_http2 proxy_fcgi setenvif ratelimit 1>/dev/null
+a2dismod status > /dev/null 2>&1
 
-cp ${ROOT_PATH}/tpl/apache.conf /etc/apache2/conf-available/0-ngatngay.conf
-a2disconf '*' 1>/dev/null
-a2enconf 0-ngatngay 1>/dev/null
+cp ${ROOT_PATH}/tpl/apache.conf /etc/apache2/conf-available/0-nightmare.conf
+a2disconf '*' 1>/dev/null || true
+a2enconf 0-nightmare 1>/dev/null
 
 rm -f /etc/apache2/sites-available/*
-cptpl apache_vhost_default.conf /etc/apache2/sites-available/0-ngatngay.conf
+cptpl apache_vhost_default.conf /etc/apache2/sites-available/0-nightmare.conf
 
 a2dissite '*' >/dev/null
 a2ensite '*' >/dev/null
@@ -58,8 +62,8 @@ for p in $(php_list); do
     systemctl stop php${p}-fpm
 
     # config
-    cptpl php-cli.ini /etc/php/${p}/cli/conf.d/0-ngatngay.ini
-    cptpl php.ini /etc/php/${p}/fpm/conf.d/0-ngatngay.ini
+    cptpl php-cli.ini /etc/php/${p}/cli/conf.d/z-nightmare.ini
+    cptpl php.ini /etc/php/${p}/fpm/conf.d/z-nightmare.ini
 
     #pool
     pool_dir=/etc/php/${p}/fpm/pool.d

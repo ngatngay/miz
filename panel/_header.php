@@ -45,5 +45,5 @@ var $ = layui.$;
     <hr>
     &bull; <a href="/log-html/">logs</a>
     <hr>
-    &bull; <a href="/server-status">status</a>
+    &bull; <a href="/setting.php">setting</a>
 </div>

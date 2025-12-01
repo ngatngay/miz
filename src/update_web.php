@@ -130,7 +130,10 @@ foreach ($domains as $domain_id => $domain) {
             $mode_tpl[] = 'ProxyPass ' . $p_uri;
             $mode_tpl[] = 'ProxyPassReverse ' . $p_uri;
         }
+    } else if ($domain['mode'] === 'custom') {
+        $mode_tpl[] = $domain['apache_custom'];
     }
+
     $apache_tpl = tpl_replace_block($apache_tpl, 'mode', implode("\n", $mode_tpl));
 
     // extra

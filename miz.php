@@ -14,6 +14,7 @@ define('app_path', '/www/app');
 define('panel_path', '/www/miz/panel');
 define('data_path', '/www/data');
 define('web_path', '/www/web');
+define('setting_path', '/www/data/setting');
 
 if (php_sapi_name() === 'cli') {
 // Kiểm tra user root
@@ -144,4 +145,12 @@ function get_tpl_domain(string $id, string $name): string {
 function put_tpl_domain(string $id, string $name, string $content): void {
     $file = '/www/data/domain/' . $id . '/' . $name;
     file_put_contents($file, $content);
+}
+
+function setting_get($key = '') {
+    return (string) @file_get_contents(setting_path . '/' . $key);
+}
+
+function setting_set($key, $value) {
+    return file_put_contents(setting_path . '/' . $key, $value);
 }

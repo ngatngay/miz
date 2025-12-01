@@ -13,7 +13,7 @@ apt-get install -y sudo dos2unix cron logrotate goaccess neovim git fish restic 
 sudo update-alternatives --install /usr/bin/vi vi /usr/bin/nvim 60 && sudo update-alternatives --set vi /usr/bin/nvim
 
 # mariadb 10.11
-apt-get install -y mariadb-server
+apt-get install -y mariadb-server mariadb-backup
 
 # apache
 add-apt-repository -y ppa:ondrej/apache2
@@ -142,8 +142,9 @@ echo 'install tool'
     curl -o wp -L https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
     chmod +x wp
 )
+pip install ps_mem --break-system-packages
 
-bash -c 'miz fix'
+bash -c 'miz fix' || true
 
 echo 1 > $INSTALLED_FILE
 

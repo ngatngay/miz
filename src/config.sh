@@ -56,6 +56,7 @@ a2dissite '*' >/dev/null
 a2ensite '*' >/dev/null
 
 apachectl configtest && systemctl restart apache2
+systemctl restart mariadb
 
 # php
 for p in $(php_list); do

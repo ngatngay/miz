@@ -38,63 +38,6 @@ else
     sudo /opt/certbot/bin/pip install --upgrade certbot certbot-dns-cloudflare
 fi
 
-# memcached
-memcached_version="1.6.39"
-memcached_current_version=""
-
-if cmd_exists memcached; then
-    memcached_current_version=$(memcached -V | awk '{print $2}')
-fi
-
-if [ "$memcached_current_version" != "$memcached_version" ]; then
-(
-    version="$memcached_version"
-    
-    apt-get install -y build-essential autotools-dev automake libevent-dev
-    
-    cd /opt/
-    curl -L -o memcached-${version}.tar.gz https://memcached.org/files/memcached-${version}.tar.gz
-    
-    tar -zxvf memcached-${version}.tar.gz
-    cd memcached-${version}
-    
-    ./configure && make && sudo make install
-)
-fi
-(
-    # memcached service
-    export PORT=11211
-    export USER=www-data
-    export CACHESIZE=1024
-    export MAXCONN=1024
-    export OPTIONS=""
-    
-    envsubst < ${ROOT_PATH}/tpl/memcached.service > /etc/systemd/system/memcached.service
-    
-    sudo systemctl daemon-reload
-    sudo systemctl enable memcached
-    sudo systemctl restart memcached
-    
-    efw =
-    memcached --version
-)
-
-#nodejs
-curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
-sudo apt-get install -y nodejs
-node -v
-
-npm install --global corepack
-corepack enable pnpm
-
-npm install -g \
-    npm-check-updates \
-    pm2 \
-    nodemon
-
-pm2 install pm2-logrotate
-#nodejs end
-
 echo 'install app'
 (
     app_dir="/www/app"

@@ -3,17 +3,6 @@
 INSTALLED_FILE="/www/data/installed"
 PHP_DEFAULT="8.3"
 
-mkdir -p /www
-mkdir -p /www/miz
-mkdir -p /www/data
-mkdir -p /www/app
-mkdir -p /www/log
-mkdir -p /www/log/apache
-mkdir -p /www/log/apache_html
-mkdir -p /www/tool
-mkdir -p /www/web
-mkdir -p /www/backup
-
 installed() {
     [[ -f $INSTALLED_FILE ]]
 }

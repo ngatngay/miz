@@ -31,7 +31,7 @@ cp ${ROOT_PATH}/tpl/systemd-journald.conf /etc/systemd/journald.conf
 systemctl restart systemd-journald
 
 # log rotate
-cptpl logrotate.apache.conf /etc/logrotate.d/miz_apache
+cp /www/miz/tpl/logrotate.d/* /etc/logrotate.d/
 
 #ssl
 echo -e "#!/bin/sh\ncertbot renew --quiet" | sudo tee /etc/cron.daily/certbot-renew > /dev/null

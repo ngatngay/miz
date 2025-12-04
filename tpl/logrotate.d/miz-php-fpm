@@ -1,0 +1,8 @@
+/www/log/php_fpm/*.log {
+	weekly
+	rotate 7
+	compress
+
+	missingok
+	notifempty
+}

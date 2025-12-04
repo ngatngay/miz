@@ -54,6 +54,26 @@ function gen_uuid(): string {
     return strtolower($uuid);
 }
 
+function get_sys_cpu()
+{
+    $cpu_info = shell_exec("nproc"); // Lấy số lượng CPU core
+    return (int)$cpu_info;
+}
+
+function get_sys_ram()
+{
+    $meminfo = file_get_contents('/proc/meminfo');
+
+    if (!preg_match('/MemTotal:\s+(\d+)\s+kB/i', $meminfo, $matches)) {
+        return null; // không tìm thấy thông tin
+    }
+
+    $mem_kb = (int)$matches[1];
+    $mem_gib = $mem_kb / 1024 / 1024; // đổi sang GiB
+
+    return (int) ceil($mem_gib); // làm tròn lên
+}
+
 function domains_load() {
     $path = data_path . '/domains.json';
     

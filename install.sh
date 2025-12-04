@@ -26,10 +26,14 @@ tar -xvf miz.tar.gz
 sudo cp -r /www/miz/tpl/fish/* /etc/fish/
 chsh -s /usr/bin/fish root
 
+# fix per
+bash /www/miz/src/fix.sh
+
 echo 'installed /www/miz'
 
 if [ ! -f '/www/data/installed' ]; then
     echo 'logout and re-login'
 else
-    echo 'installed'
+    echo 'updated'
 fi
+

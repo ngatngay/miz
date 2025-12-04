@@ -1,4 +1,3 @@
 #!/bin/bash
 
-cd /www/miz
-git pull
+bash /www/miz/install.sh

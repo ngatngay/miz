@@ -24,6 +24,7 @@ node -v
 # <<
 
 # >> install plugin
+exit
 
 npm install --global corepack
 corepack enable pnpm

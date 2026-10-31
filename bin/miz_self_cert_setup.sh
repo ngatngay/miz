@@ -1,0 +1,152 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+const CERT_LIVE_TIME = 10;
+const CERT_RENEW_AFTER = 8;
+
+function build_cert(string $domain_root, string $pem_file): void
+{
+    $san_entries = ['DNS:' . $domain_root];
+    $san_entries[] = 'DNS:*.' . $domain_root;
+
+    $cnf_file = tempnam(sys_get_temp_dir(), 'miz_');
+    if ($cnf_file === false) {
+        throw new Exception("Khong tao duoc file config tam");
+    }
+
+    $openssl_last_error = static function (string $fallback): string {
+        $messages = [];
+
+        while (($msg = openssl_error_string()) !== false) {
+            $messages[] = $msg;
+        }
+
+        return $messages === [] ? $fallback : ($fallback . ': ' . implode(' | ', $messages));
+    };
+
+    try {
+        $openssl_config = "[req]\n"
+            . "distinguished_name = req_distinguished_name\n"
+            . "prompt = no\n"
+            . "default_md = sha256\n"
+            . "req_extensions = v3_req\n"
+            . "x509_extensions = v3_req\n\n"
+            . "[req_distinguished_name]\n"
+            . "CN = {$domain_root}\n\n"
+            . "[v3_req]\n"
+            . "basicConstraints = CA:FALSE\n"
+            . "keyUsage = digitalSignature, keyEncipherment\n"
+            . "extendedKeyUsage = serverAuth\n"
+            . 'subjectAltName = ' . implode(',', $san_entries) . "\n";
+
+        if (file_put_contents($cnf_file, $openssl_config) === false) {
+            throw new Exception("Khong ghi duoc openssl config");
+        }
+
+        $private_key = openssl_pkey_new([
+            'private_key_bits' => 2048,
+            'private_key_type' => OPENSSL_KEYTYPE_RSA,
+        ]);
+        if ($private_key === false) {
+            throw new Exception($openssl_last_error('Khong tao duoc private key'));
+        }
+
+        $csr = openssl_csr_new(['commonName' => $domain_root], $private_key, [
+            'digest_alg' => 'sha256',
+            'config' => $cnf_file,
+            'req_extensions' => 'v3_req',
+        ]);
+        if ($csr === false) {
+            throw new Exception($openssl_last_error('Khong tao duoc CSR'));
+        }
+
+        $x509 = openssl_csr_sign($csr, null, $private_key, CERT_LIVE_TIME * 365, [
+            'digest_alg' => 'sha256',
+            'config' => $cnf_file,
+            'x509_extensions' => 'v3_req',
+        ]);
+        if ($x509 === false) {
+            throw new Exception($openssl_last_error('Khong tao duoc self cert'));
+        }
+
+        $cert_pem = '';
+        if (!openssl_x509_export($x509, $cert_pem)) {
+            throw new Exception($openssl_last_error('Khong export duoc cert'));
+        }
+
+        $key_pem = '';
+        if (!openssl_pkey_export($private_key, $key_pem, null, ['config' => $cnf_file])) {
+            throw new Exception($openssl_last_error('Khong export duoc private key'));
+        }
+
+        if (file_put_contents($pem_file, $cert_pem . $key_pem) === false) {
+            throw new Exception("Khong ghi duoc file cert: {$pem_file}");
+        }
+
+        chmod($pem_file, 0640);
+    } finally {
+        if (is_file($cnf_file)) {
+            @unlink($cnf_file);
+        }
+    }
+}
+
+try {
+    if (count($argv) !== 2) {
+        throw new Exception('missing arg');
+    }
+
+    $raw_domain = trim(strtolower((string) ($argv[1] ?? '')));
+    $domain_root = str_starts_with($raw_domain, '*.') ? substr($raw_domain, 2) : $raw_domain;
+
+    if ($domain_root === '' || str_contains($domain_root, '*')) {
+        throw new Exception('domain không hợp lệ');
+    }
+
+    if (filter_var($domain_root, FILTER_VALIDATE_IP) !== false) {
+        throw new Exception('domain không hợp lệ');
+    }
+
+    $is_valid_domain = filter_var($domain_root, FILTER_VALIDATE_DOMAIN, FILTER_FLAG_HOSTNAME) !== false;
+    if (!$is_valid_domain) {
+        $is_fallback_label = preg_match('/^(?!-)[a-z0-9-]+(?<!-)$/', $domain_root) === 1;
+        if (!$is_fallback_label) {
+            throw new Exception('domain không hợp lệ');
+        }
+
+    }
+
+    $cert_dir = '/miz_data/certs_self';
+    if (!is_dir($cert_dir) && !mkdir($cert_dir, 0755, true) && !is_dir($cert_dir)) {
+        throw new Exception("Khong tao duoc thu muc cert: {$cert_dir}");
+    }
+
+    $cert_file = $cert_dir . '/' . $domain_root . '.pem';
+    $renew = true;
+
+    if (is_file($cert_file)) {
+        $pem_content = file_get_contents($cert_file);
+        if ($pem_content !== false && trim($pem_content) !== '') {
+            $cert_info = @openssl_x509_parse($pem_content);
+            if (is_array($cert_info)) {
+                $valid_from = $cert_info['validFrom_time_t'] ?? null;
+                if (is_int($valid_from) && $valid_from > 0) {
+                    $renew_after_seconds = CERT_RENEW_AFTER * 365 * 24 * 60 * 60;
+                    $renew = (time() - $valid_from) >= $renew_after_seconds;
+                }
+            }
+        }
+    }
+
+    if (!$renew) {
+        exit(0);
+    }
+
+    build_cert($domain_root, $cert_file);
+    exit(0);
+} catch (Throwable $e) {
+    fwrite(STDERR, 'ERROR: ' . $e->getMessage() . "\n");
+    exit(1);
+}

@@ -1,0 +1,36 @@
+* {
+    word-wrap: break-word;
+}
+
+body {
+    font-size: 16px;
+    background: #f5f7fb;
+    color: #1f2937;
+    margin: 0;
+}
+
+img {
+    max-width: 100%;
+}
+
+a {
+    text-decoration: none;
+}
+
+.panel-shell {
+    max-width: 960px;
+}
+
+.code-custom {
+    background: #0f172a;
+    color: #e2e8f0;
+    border-radius: 0.5rem;
+    padding: 0.85rem;
+    margin: 0;
+    white-space: pre;
+    overflow-x: auto;
+    font-size: 0.875rem;
+    line-height: 1.45;
+}
+
+

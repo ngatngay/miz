@@ -1,0 +1,312 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+source /miz/miz.sh
+
+
+# >> ADMIN PASSWD
+
+MIZ_LAMP_PWD=""
+if [ -s /miz_data/.pwd ]; then
+    MIZ_LAMP_PWD="$(cat /miz_data/.pwd)"
+fi
+
+if [ -z "$MIZ_LAMP_PWD" ]; then
+    echo "missing lamp pwd"
+    exit 1
+fi
+
+# <<
+
+
+# >> INSTALL PKG
+
+echo
+echo
+
+#php_start
+curl -sSLo /tmp/debsuryorg-archive-keyring.deb https://packages.sury.org/debsuryorg-archive-keyring.deb
+dpkg -i /tmp/debsuryorg-archive-keyring.deb
+sh -c 'echo "deb [signed-by=/usr/share/keyrings/debsuryorg-archive-keyring.gpg] https://packages.sury.org/php/ $(lsb_release -sc) main" > /etc/apt/sources.list.d/php.list'
+#php_end
+
+add-apt-repository -n -y ppa:vbernat/haproxy-3.2
+
+apt-get update --yes
+apt-get install --yes --no-upgrade haproxy apache2 apache2-dev libapache2-mod-xsendfile ssl-cert wrk goaccess \
+    $(miz_php_install 5.6 7.4 8.0 8.1 8.2 8.3 8.4 8.5) \
+    mariadb-server \
+    vsftpd
+
+# install certbot
+if ! command -v certbot >/dev/null 2>&1; then
+    python3 -m venv /opt/certbot/
+    /opt/certbot/bin/pip install --upgrade pip
+fi
+
+/opt/certbot/bin/pip install --upgrade certbot
+ln -sf /opt/certbot/bin/certbot /usr/bin/certbot
+
+# <<
+
+
+echo "config-ing..."
+
+
+# ========
+
+bash /miz/bin/miz_php_set_default_version.sh 8.2
+echo
+echo '>>'
+echo
+
+mkdir -p /miz_data/panel
+
+#user
+echo "=== BẮT ĐẦU XỬ LÝ USER ==="
+
+if id "www" >/dev/null 2>&1; then
+    usermod -s "/usr/bin/fish" -d "/home/www" "www"
+else
+    useradd -s "/usr/bin/fish" -d "/home/www" "www"
+fi
+
+groupadd "www" 2>/dev/null || true
+usermod -g "www" "www"
+usermod -aG "www" "www-data"
+
+mkdir -p "/home/www"
+chown "www:www" "/home/www"
+
+mkdir -p "/miz_data/app"
+
+mkdir -p "/miz_data/app/file-manager"
+if [ ! -s "/miz_data/app/file-manager/index.php" ]; then
+    unzip -oq /miz_data/app/file-manager-php.zip -d "/miz_data/app/file-manager"
+fi
+
+mkdir -p "/miz_data/app/phpmyadmin"
+if [ ! -s "/miz_data/app/phpmyadmin/index.php" ]; then
+    rm -rf "/miz_data/app/phpMyAdmin-"* "/miz_data/app/phpmyadmin"
+    unzip -oq /miz_data/app/phpmyadmin.zip -d "/miz_data/app"
+    mv "/miz_data/app/phpMyAdmin-"* "/miz_data/app/phpmyadmin"
+    cp /miz/tpl/phpmyadmin.config.php "/miz_data/app/phpmyadmin/config.inc.php"
+fi
+
+chmod 711 /miz_data/app
+chown root:root /miz_data/app
+
+chown -R www:www /miz_data/app/*
+
+mkdir -p "/home/www/web"
+chown www:www "/home/www/web"
+
+chmod 711 /home
+chmod 750 /home/www
+
+echo "=== HOÀN TẤT ==="
+# user
+
+chown root:www-data -R /miz_data/panel
+chmod 750 /miz_data/panel
+cp -r /miz/panel/. /miz_data/panel/
+
+# auto ssl
+sudo cat > /etc/systemd/system/miz_lamp_auto_ssl.service <<'EOF'
+[Unit]
+Description=MIZ LAMP Auto SSL
+After=network.target apache2.service haproxy.service
+Requires=apache2.service haproxy.service
+
+[Service]
+Type=simple
+
+TimeoutStartSec=0
+TimeoutStopSec=0
+
+ExecStartPre=/bin/sleep 999
+Environment=MIZ_SYSTEMD_AUTO_SSL=1
+ExecStart=/miz/bin/miz_lamp_renew_ssl.sh
+
+Restart=always
+RestartSec=86400
+
+User=root
+Group=root
+
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+sudo systemctl daemon-reload
+sudo systemctl enable miz_lamp_auto_ssl
+sudo systemctl restart miz_lamp_auto_ssl &
+
+# php admin
+sudo cat > /etc/systemd/system/miz_php_fpm_admin.service <<'EOF'
+[Unit]
+Description=PHP-FPM Admin
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/sbin/php-fpm8.2 --allow-to-run-as-root --fpm-config /miz/tpl/php-fpm-pool-admin.conf --nodaemonize
+Restart=always
+RestartSec=2
+
+User=root
+Group=root
+
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+sudo systemctl daemon-reload
+sudo systemctl enable miz_php_fpm_admin
+sudo systemctl restart miz_php_fpm_admin
+
+
+# ========
+
+
+mkdir -p /var/lib/php/sessions
+chown root:root /var/lib/php/sessions
+chmod 1733 /var/lib/php/sessions
+
+rm -rf /var/lib/php/opcaches
+mkdir -p /var/lib/php/opcaches
+chown www:www /var/lib/php/opcaches
+chmod 700 /var/lib/php/opcaches
+
+phpdismod -v ALL -s fpm ffi
+phpenmod -v ALL -s ALL sysvshm sysvmsg sysvsem msgpack imagick imap mcrypt opcache xmlrpc
+
+# php
+for p in $(miz_php_list); do
+    # config
+    cp -f /miz/tpl/php-cli.ini /etc/php/${p}/cli/conf.d/z-nightmare.ini
+    cp -f /miz/tpl/php.ini /etc/php/${p}/fpm/conf.d/z-nightmare.ini
+
+    #pool
+    pool_dir=/etc/php/${p}/fpm/pool.d
+    rm -f ${pool_dir}/*
+
+    export tpl_php=$p
+    export php=$p
+
+    envsubst < /miz/tpl/php-fpm.conf > /etc/php/$p/fpm/php-fpm.conf
+    envsubst < /miz/tpl/php-fpm-pool-default.conf > $pool_dir/www.conf
+done
+
+for p in $(miz_php_list); do
+    systemctl reload php${p}-fpm
+done
+
+
+# ========
+
+# APACHE
+
+#create for panel
+htpasswd -bc /miz_data/.htpasswd admin "$MIZ_LAMP_PWD"
+chmod 644 /miz_data/.htpasswd
+
+
+# service
+cat > /etc/apache2/ports.conf <<'EOL'
+Listen 18080
+Listen 18081
+EOL
+
+a2dismod -f '*' || true
+a2enmod access_compat alias auth_basic authn_core authn_file authz_core authz_host authz_user autoindex deflate dir env expires filter headers mime mpm_event proxy proxy_fcgi proxy_http remoteip rewrite setenvif || true
+# xsendfile status reqtimeout http2 proxy_http2 ssl socache_shmcb
+
+cp /miz/tpl/apache.conf /etc/apache2/conf-available/0-nightmare.conf
+a2disconf '*' 1>/dev/null || true
+a2enconf '0-*' 1>/dev/null
+
+rm -f /etc/apache2/sites-available/*
+cp -f /miz/tpl/apache_vhost_default.conf /etc/apache2/sites-available/0-nightmare.conf
+
+a2dissite '*' >/dev/null
+a2ensite '*' >/dev/null
+
+apachectl configtest && systemctl restart apache2
+
+# cron
+miz_cron_add miz_lamp_gen_stats
+
+
+# ========
+
+
+# mysql
+
+ROOT_PASS="$MIZ_LAMP_PWD"
+ESCAPED_PASS=$(printf '%s' "$ROOT_PASS" | sed "s/'/''/g")
+
+# Dùng MYSQL_PWD để tránh lộ password trong ps aux
+if mysql -u root --connect-timeout=5 -e "SELECT 1" &>/dev/null; then
+    MYSQL_CMD="mysql -u root"
+else
+    export MYSQL_PWD="$ROOT_PASS"
+    MYSQL_CMD="mysql -u root"
+fi
+
+$MYSQL_CMD <<EOF
+UPDATE mysql.global_priv SET priv=json_set(priv,
+  '$.password_last_changed', UNIX_TIMESTAMP(),
+  '$.plugin', 'mysql_native_password',
+  '$.authentication_string', PASSWORD('${ESCAPED_PASS}'),
+  '$.auth_or', json_array(json_object(), json_object('plugin', 'unix_socket'))
+) WHERE User='root';
+
+CREATE USER IF NOT EXISTS 'root'@'127.0.0.1' IDENTIFIED BY '${ESCAPED_PASS}';
+GRANT ALL PRIVILEGES ON *.* TO 'root'@'127.0.0.1' WITH GRANT OPTION;
+
+DELETE FROM mysql.global_priv WHERE User='';
+DELETE FROM mysql.global_priv WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1');
+
+FLUSH PRIVILEGES;
+EOF
+
+# <<
+
+
+# setup
+
+rm -rf /var/lib/haproxy/cert
+mkdir -p /var/lib/haproxy/cert
+
+CERT=/var/lib/haproxy/cert/0.pem
+
+openssl req -x509 -newkey rsa:2048 -nodes \
+    -keyout /tmp/miz_lamp_cert.key \
+    -out /tmp/miz_lamp_cert.crt \
+    -days 36500 \
+    -subj "/CN=localhost"
+
+cat /tmp/miz_lamp_cert.crt /tmp/miz_lamp_cert.key > "$CERT"
+
+
+cp -f /miz/tpl/haproxy.cfg /etc/haproxy/haproxy.cfg
+systemctl restart haproxy
+
+
+# ========
+
+
+echo
+echo
+echo '>>'
+echo
+
+echo "cai dat / cap nhat thanh cong!"
+echo

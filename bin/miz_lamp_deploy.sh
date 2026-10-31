@@ -1,0 +1,330 @@
+#!/usr/bin/env php
+<?php
+
+define('ACCESS', true);
+require __DIR__ . '/../miz.php';
+
+// ========
+//
+//
+$http_keepalive = (int) miz_setting::get('http_keepalive');
+
+$domains = miz_domain::get_all();
+$domains_runtime = [];
+
+// BUILD DOMAIN ACTIVE
+foreach ($domains as $domain_id => $domain) {
+    if ($domain['status'] != 'on') {
+        continue;
+    }
+
+    $domain['dir'] = trim($domain['dir']);
+    $domain['dir'] = trim($domain['dir'], '/');
+
+    if (empty($domain['dir'])) {
+        $domain['dir'] = '/var/www/html';
+    } else {
+        $domain['dir'] = '/home/www/' . $domain['dir'];
+    }
+    
+    $domain['dir_run'] = trim($domain['dir_run']);
+    $domain['dir_run'] = trim($domain['dir_run'], '/');
+    $domain['dir_run'] = $domain['dir'] . '/' . $domain['dir_run'];
+
+    $domain['domains_arr'] = miz_domain::parse_domains($domain['domains']);
+    $domain['domain'] = $domain['domains_arr'][0];
+
+    $domain['apache_xsendfile_dir'] = $domain['dir'];
+
+    $domain['domain_tmp_path'] = '/miz_data/domains/' . trim($domain_id) . '/tmp';
+
+    passthru('rm -rf ' . escapeshellarg($domain['domain_tmp_path']));
+    passthru('mkdir -p ' . escapeshellarg($domain['domain_tmp_path']));
+
+    $domains_runtime[$domain_id] = $domain;
+}
+
+
+
+// ========
+// CERTS
+//
+if (true) {
+    echo "\nĐang lấy SSL...\n";
+    
+    passthru('rm -rf /var/lib/haproxy/cert/9-*');
+
+    // GET
+    foreach ($domains_runtime as $domain_id => $domain) {
+        if ($domain['ssl_mode'] == 'self_signed') {
+            continue;
+        }
+
+        foreach ($domain['domains_arr'] as $d) {
+            if (miz_certbot::has($d)) {
+                continue;
+            }
+
+            $cmd = 'certbot certonly'
+                . ' --quiet'
+                . ' --standalone'
+                . ' --http-01-port 18082'
+                . ' -d ' . escapeshellarg($d)
+                . ' --cert-name ' . escapeshellarg($d)
+                . ' --expand'
+                . ' --non-interactive'
+                . ' --keep-until-expiring'
+                . ' --register-unsafely-without-email'
+                . ' --agree-tos';
+
+            passthru($cmd, $cmd_status);
+
+            if ($cmd_status !== 0) {
+                echo "[E] Lỗi lấy SSL {$d}. Chuyển sang chế độ SELF nếu đứng sau PROXY.\n";
+            }
+        }
+    }
+    // GET END
+
+    passthru('/miz/bin/miz_lamp_commit_ssl.sh');
+}
+
+
+
+// --- --- ---
+// --- PHP-FPM ---
+// --- --- ---
+if (true) {
+    echo "\nĐang cấu hình PHP...\n";
+
+    passthru('rm -rf /etc/php/*/fpm/pool.d/9-*.conf');
+
+    foreach ($domains_runtime as $domain_id => $domain) {
+        if ($domain['mode'] != 'php') {
+            continue;
+        }
+        if (empty($domain['mode_php'])) {
+            continue;
+        }
+
+        //
+        $php_conf = $domain['domain_tmp_path'] . '/php-fpm-pool.conf';
+        $php_tpl = miz::gen_tpl('php-fpm-pool.conf', $domain);
+        file_put_contents($php_conf, $php_tpl);
+
+        $custom_php_fpm_ini = $domain['mode_php_fpm_ini'];
+        $custom_php_fpm_ini_lines = [];
+
+        if ($custom_php_fpm_ini !== '') {
+            foreach (preg_split('/\R/', $custom_php_fpm_ini) as $line) {
+                $line = trim($line);
+                if ($line === '') {
+                    continue;
+                }
+
+                if (str_starts_with($line, 'php_value') || str_starts_with($line, 'php_admin_value')) {
+                    $custom_php_fpm_ini_lines[] = $line;
+                }
+            }
+        }
+
+        $custom_php_fpm_ini_filtered = implode("\n", $custom_php_fpm_ini_lines);
+        $php_runtime_conf = $php_tpl;
+
+        $custom_max_process = trim($domain['mode_php_fpm_max_process']);
+        if ($custom_max_process !== '' && ctype_digit($custom_max_process)) {
+            $php_runtime_conf = preg_replace('/^pm\.max_children\s*=\s*.*$/m', 'pm.max_children = ' . $custom_max_process, $php_runtime_conf);
+	        $php_runtime_conf = preg_replace('/^listen\.backlog\s*=\s*.*$/m', 'listen.backlog = ' . ($custom_max_process * 3), $php_runtime_conf);
+        }
+
+        $custom_open_basedir = trim((string) ($domain['mode_php_fpm_ini_open_basedir'] ?? ''));
+        if ($custom_open_basedir !== '') {
+            $php_runtime_conf = preg_replace('/^php_admin_value\[open_basedir\]\s*=\s*.*$/m', 'php_admin_value[open_basedir] = ' . $custom_open_basedir, $php_runtime_conf);
+        }
+
+        if ($custom_php_fpm_ini_filtered !== '') {
+            $php_runtime_conf .= "\n\n" . $custom_php_fpm_ini_filtered;
+        }
+
+        file_put_contents('/etc/php/' . $domain['mode_php'] . '/fpm/pool.d/9-' . $domain_id . '.conf', $php_runtime_conf);   
+    }
+
+    // reload all
+    $versions = ['5.6', '7.4', '8.0', '8.1', '8.2', '8.3', '8.4', '8.5'];
+
+    foreach ($versions as $v) {
+        $php_fpm_cmd = 'php-fpm' . $v;
+        exec($php_fpm_cmd . ' -t >/dev/null 2>&1', $test_output, $test_code);
+
+        if ($test_code !== 0) {
+            echo "- Cấu hình PHP-FPM {$v} lỗi\n";
+            passthru($php_fpm_cmd . ' -t');
+            exit;
+        }
+    }
+
+    foreach ($versions as $v) {
+        passthru("systemctl reload php{$v}-fpm");
+    }
+
+    passthru("rm -rf /var/lib/php/opcaches/*");
+}
+
+
+
+// --- --- ---
+// --- APACHE ---
+// --- --- ---
+
+if (true) {
+    echo "\nĐang cấu hình APACHE...\n";
+
+    passthru('rm -rf /etc/apache2/sites-available/9-*.conf');
+    passthru('rm -rf /etc/apache2/sites-enabled/9-*.conf');
+
+    foreach ($domains_runtime as $domain_id => $domain) {
+        if (!in_array($domain['mode'], ['php', 'static'])) {
+            continue;
+        }
+
+        // gen tpl
+        $apache_tpl = miz::gen_tpl('apache_vhost.conf', $domain);
+
+        if ($domain['mode'] != 'php') {
+            $apache_tpl = miz::tpl_replace_block($apache_tpl, 'php', '');
+        }
+
+        file_put_contents($domain['domain_tmp_path'] . '/apache.conf', $apache_tpl);
+        $apache_site_conf = $domain['mode_apache_tpl'] ?: $apache_tpl;
+
+        $available = '/etc/apache2/sites-available/9-' . $domain_id . '.conf';
+        $enabled   = '/etc/apache2/sites-enabled/9-' . $domain_id . '.conf';
+        
+        file_put_contents($available, $apache_site_conf);
+        symlink($available, $enabled);
+    }
+
+    exec('apachectl configtest >/dev/null 2>&1', $o, $e);
+    if ($e !== 0) {
+        exec('apachectl configtest');
+        exit;
+    }
+
+    passthru("systemctl reload apache2");
+}
+
+
+
+// >> HAPROXY
+
+if (true) {
+    echo "\nĐang cấu hình PROXY...\n";
+
+    $haproxy_fe = "";
+    $haproxy_be = "\n\n";
+    $i = 0;
+
+    foreach ($domains_runtime as $domain_id => $domain) {
+        $i++;
+
+        // build info     
+        if ($domain['mode'] == 'proxy') {
+            $curr_scheme = $domain['mode_proxy_scheme'] ?: 'http';
+            $curr_host = $domain['mode_proxy_host'] ?: '127.0.0.1';
+            $curr_port = $domain['mode_proxy_port'] ?: '8080';
+            } else {
+            $curr_scheme = 'http';
+            $curr_host = '127.0.0.1';
+            $curr_port = '18080';
+        }
+
+        $curr_fe = '';
+        $curr_be = '';
+        
+        $tpl_scheme_be = '';
+
+        // build acl
+        $acl_name = "miz_acl_{$i}";
+        $acl_name_full = '';
+
+        foreach ($domain['domains_arr'] as $d) {
+            if (str_starts_with($d, '*.')) {
+                $domain_pattern = str_replace('*.', '.', $d);
+                $acl_name_full .= "    acl {$acl_name} ssl_fc_sni -m end {$domain_pattern}\n";
+            } else {
+                $acl_name_full .= "    acl {$acl_name} ssl_fc_sni -i {$d}\n";
+            }
+        }
+        
+        $acl_name_full = "\n$acl_name_full\n";
+        $curr_fe .= $acl_name_full;
+
+        // build backend
+        $backend_name = "miz_backend_$i";
+        $curr_fe .= "    use_backend {$backend_name} if $acl_name\n\n";
+
+        $max_conn = (int) ($domain['max_conn'] ?? 0);
+        $max_conn_option = $max_conn === 0 ? '' : "maxconn {$max_conn}";
+
+        $curr_be .= "
+backend $backend_name
+    description " . $domain['domains'] . "
+    mode http
+
+    http-reuse always
+
+    option forwardfor except 127.0.0.1
+
+    server " . $domain['mode'] . " {$curr_host}:{$curr_port} check {$max_conn_option} pool-purge-delay 900s alpn http/1.1
+";
+
+        // wirite file gốc
+        file_put_contents($domain['domain_tmp_path'] . '/haproxy.conf', "$curr_fe\n###\n\n$curr_be");
+
+        // ghi đè nếu có tpl
+        if (!empty($domain['mode_haproxy_tpl'])) {
+            $domain['mode_haproxy_tpl'] = str_replace('{{ id }}', $i, $domain['mode_haproxy_tpl']);
+            $domain['mode_haproxy_tpl'] = str_replace('{{ domains }}', $domain['domains'], $domain['mode_haproxy_tpl']);
+            $domain['mode_haproxy_tpl'] = str_replace('{{ frontend_acl }}', $acl_name_full, $domain['mode_haproxy_tpl']);
+            $domain['mode_haproxy_tpl'] = str_replace('{{ frontend }}', $acl_name, $domain['mode_haproxy_tpl']);
+            $domain['mode_haproxy_tpl'] = str_replace('{{ backend }}', $backend_name, $domain['mode_haproxy_tpl']);
+
+            $haproxy_parts = explode('###', $domain['mode_haproxy_tpl'], 2);
+            $curr_fe = $haproxy_parts[0];
+            $curr_be = $haproxy_parts[1] ?? '';
+        }
+        
+        // ghi vào global config
+        $haproxy_fe .= "\n$curr_fe\n";
+        $haproxy_be .= "\n$curr_be\n";
+    }
+
+    $haproxy = $haproxy_fe . $haproxy_be;
+    passthru("cp -f /miz/tpl/haproxy.cfg /etc/haproxy/haproxy.cfg");
+
+    str_replace_file('30s#miz_fe', $http_keepalive . 's', '/etc/haproxy/haproxy.cfg');
+    str_replace_file('#miz_generator', $haproxy, '/etc/haproxy/haproxy.cfg');
+
+    echo "\n";
+    miz_haproxy::reload();
+}
+
+
+// <<
+
+
+// --- --- ---
+// --- CRON ---
+// --- --- ---
+if (true) {
+    echo "\nĐang cấu hình CRON...\n";
+
+    miz_cron::deploy();
+}
+
+
+// <<
+
+
+echo "\n\n";
+echo "DONE.\n";

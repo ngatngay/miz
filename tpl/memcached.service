@@ -1,0 +1,28 @@
+[Unit]
+Description=memcached daemon
+After=network.target
+
+[Service]
+ExecStart=/usr/local/bin/memcached \
+    -s /run/memcached/memcached.sock \
+    -a 0660 \
+    -u ${USER} \
+    -m ${CACHESIZE} \
+    -c ${MAXCONN} \
+    -I 4m $OPTIONS
+
+PrivateTmp=true
+ProtectSystem=full
+NoNewPrivileges=true
+PrivateDevices=true
+CapabilityBoundingSet=CAP_SETGID CAP_SETUID CAP_SYS_RESOURCE
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+
+User=www-data
+Group=www-data
+
+RuntimeDirectory=memcached
+RuntimeDirectoryMode=0755
+
+[Install]
+WantedBy=multi-user.target

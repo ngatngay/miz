@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+
+# ==============================
+# File: miz_ip_unban.sh
+# Usage: ./miz_ip_unban.sh <IP_ADDRESS>
+# ==============================
+
+IP_ADDRESS="$1"
+
+if [ -z "$IP_ADDRESS" ]; then
+    echo "Usage: $0 <IP_ADDRESS>"
+    exit 1
+fi
+
+# Kiểm tra rule có tồn tại không
+iptables -C INPUT -s "$IP_ADDRESS" -j DROP 2>/dev/null
+if [ $? -ne 0 ]; then
+    echo "IP $IP_ADDRESS hiện không bị chặn."
+    exit 0
+fi
+
+# Xóa rule chặn IP
+iptables -D INPUT -s "$IP_ADDRESS" -j DROP
+
+if [ $? -eq 0 ]; then
+    echo "Đã gỡ chặn IP: $IP_ADDRESS"
+else
+    echo "Không thể gỡ chặn IP: $IP_ADDRESS"
+    exit 1
+fi

@@ -46,7 +46,7 @@ $php_versions = [
 $editing_data = $editing_domain;
 $forms = array_replace(miz_domain::config_tpl(), $domain, $_POST);
 $forms['domains'] = preg_replace('/\s+/', ' ', $forms['domains']);
-$forms['mode_php'] = $forms['mode_php'] ?: '8.2';
+$forms['mode_php'] = $forms['mode_php'] ?: '8.3';
 $forms['dir'] = trim($forms['dir'], '/');
 $forms['dir_run'] = trim($forms['dir_run'], '/');
 

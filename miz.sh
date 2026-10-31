@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-PHP_DEFAULT="8.2"
+PHP_DEFAULT="8.3"
 
 ###
 

@@ -55,7 +55,7 @@ echo "config-ing..."
 
 # ========
 
-bash /miz/bin/miz_php_set_default_version.sh 8.2
+bash /miz/bin/miz_php_set_default_version.sh 8.3
 echo
 echo '>>'
 echo
@@ -153,7 +153,7 @@ After=network.target
 
 [Service]
 Type=simple
-ExecStart=/usr/sbin/php-fpm8.2 --allow-to-run-as-root --fpm-config /miz/tpl/php-fpm-pool-admin.conf --nodaemonize
+ExecStart=/usr/sbin/php-fpm8.3 --allow-to-run-as-root --fpm-config /miz/tpl/php-fpm-pool-admin.conf --nodaemonize
 Restart=always
 RestartSec=2
 

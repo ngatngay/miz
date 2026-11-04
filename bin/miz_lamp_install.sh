@@ -30,10 +30,8 @@ dpkg -i /tmp/debsuryorg-archive-keyring.deb
 sh -c 'echo "deb [signed-by=/usr/share/keyrings/debsuryorg-archive-keyring.gpg] https://packages.sury.org/php/ $(lsb_release -sc) main" > /etc/apt/sources.list.d/php.list'
 #php_end
 
-add-apt-repository -n -y ppa:vbernat/haproxy-3.2
-
 apt-get update --yes
-apt-get install --yes --no-upgrade haproxy apache2 apache2-dev libapache2-mod-xsendfile ssl-cert wrk goaccess \
+apt-get install --yes --no-upgrade haproxy apache2 libapache2-mod-xsendfile ssl-cert wrk goaccess \
     $(miz_php_install 5.6 7.4 8.0 8.1 8.2 8.3 8.4 8.5) \
     mariadb-server \
     vsftpd

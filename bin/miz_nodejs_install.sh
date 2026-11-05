@@ -9,18 +9,14 @@ if command -v node >/dev/null 2>&1; then
 fi
 
 # >> install
-
 sudo apt-get update -y
-
 # <<
 
 # >> https://nodesource.com/products/distributions
-
 sudo apt-get install -y curl
-curl -fsSL https://deb.nodesource.com/setup_24.x | sudo -E bash -
+curl -fsSL https://deb.nodesource.com/setup_26.x | sudo -E bash -
 sudo apt-get install -y nodejs
 node -v
-
 # <<
 
 # >> install plugin
@@ -35,5 +31,4 @@ npm install -g \
     nodemon
 
 pm2 install pm2-logrotate
-
 # <<

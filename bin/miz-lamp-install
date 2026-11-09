@@ -221,7 +221,7 @@ a2disconf '*' 1>/dev/null || true
 a2enconf '0-*' 1>/dev/null
 
 rm -f /etc/apache2/sites-available/*
-cp -f /miz/tpl/apache_vhost_default.conf /etc/apache2/sites-available/0-nightmare.conf
+cp -f /miz/tpl/apache-vhost-default.conf /etc/apache2/sites-available/0-nightmare.conf
 
 a2dissite '*' >/dev/null
 a2ensite '*' >/dev/null

@@ -188,7 +188,7 @@ if (true) {
         }
 
         // gen tpl
-        $apache_tpl = miz::gen_tpl('apache_vhost.conf', $domain);
+        $apache_tpl = miz::gen_tpl('apache-vhost.conf', $domain);
 
         if ($domain['mode'] != 'php') {
             $apache_tpl = miz::tpl_replace_block($apache_tpl, 'php', '');

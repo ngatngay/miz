@@ -40,7 +40,7 @@ apt-get update --yes
 apt-get install --yes --no-upgrade \
     sudo software-properties-common cron logrotate rsyslog dos2unix e2fsprogs \
     lsb-release ca-certificates curl \
-    crudini db-util \
+    db-util \
     curl git tmux fish neovim zoxide ripgrep jq strace direnv zip unzip socat netcat-openbsd \
     python3 python3-dev python3-venv python3-pip python3-full python-is-python3 \
     gcc libaugeas-dev \

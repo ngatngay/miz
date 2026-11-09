@@ -55,6 +55,7 @@ $site_head = isset($site_head) ? $site_head : '';
       <li class="list-group-item"><a href="/server-stats">http stats</a></li>
 
       <li class="list-group-item"><a href="/crontab.php">crontab</a></li>
+      <li class="list-group-item"><a href="/ftptab.php">ftp</a></li>
       <li class="list-group-item"><a href="/cmd.php">run cmd</a></li>
 
       <li class="list-group-item"><a href="/settings.php">settings</a></li>

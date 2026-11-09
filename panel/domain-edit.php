@@ -99,7 +99,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($is_edit_mode && $target_id !== $id) {
                 miz_domain::unset($id);
             }
-            header('Location: domain_edit.php?id=' . urlencode($target_id) . '&success=1&act=' . ($is_edit_mode ? 'edit' : 'add'));
+            header('Location: domain-edit.php?id=' . urlencode($target_id) . '&success=1&act=' . ($is_edit_mode ? 'edit' : 'add'));
             exit;
         }
     }
@@ -225,7 +225,7 @@ require SITE_HEADER;
 
     <div class="d-flex gap-2 mb-0">
         <button type="submit" class="btn btn-primary"><?= $is_edit_mode ? 'Lưu' : 'Thêm' ?></button>
-        <a class="btn btn-outline-secondary" href="/domain_list.php">Hủy</a>
+        <a class="btn btn-outline-secondary" href="/domain-list.php">Hủy</a>
     </div>
 
     <hr class="mt-3 mb-0">

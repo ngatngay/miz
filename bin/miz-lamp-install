@@ -63,16 +63,6 @@ mkdir -p /miz_data/panel
 #user
 echo "=== BẮT ĐẦU XỬ LÝ USER ==="
 
-if id "www" >/dev/null 2>&1; then
-    usermod -s "/usr/bin/fish" -d "/home/www" "www"
-else
-    useradd -s "/usr/bin/fish" -d "/home/www" "www"
-fi
-
-groupadd "www" 2>/dev/null || true
-usermod -g "www" "www"
-usermod -aG "www" "www-data"
-
 mkdir -p "/home/www"
 chown "www:www" "/home/www"
 

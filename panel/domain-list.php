@@ -21,7 +21,7 @@ $domains = miz_domain::get_all();
 </div>
 
 <div class="mb-3">
-    <a class="btn btn-sm btn-primary" href="/domain_edit.php">Thêm domain</a>
+    <a class="btn btn-sm btn-primary" href="/domain-edit.php">Thêm domain</a>
     <a href="/cmd.php?cmd=/miz/bin/miz-lamp-deploy" class="btn btn-sm btn-success">CẬP NHẬT CÀI ĐẶT</a>
 </div>
 
@@ -46,8 +46,8 @@ $domains = miz_domain::get_all();
         
         <span class="badge text-bg-dark">|</span>
 
-        <a class="badge text-bg-warning" href="/domain_edit.php?id=<?= rawurlencode($domain_id) ?>">[SỬA]</a>
-        <a class="badge text-bg-danger" href="/domain_delete.php?id=<?= rawurlencode($domain_id) ?>">[XÓA]</a>
+        <a class="badge text-bg-warning" href="/domain-edit.php?id=<?= rawurlencode($domain_id) ?>">[SỬA]</a>
+        <a class="badge text-bg-danger" href="/domain-delete.php?id=<?= rawurlencode($domain_id) ?>">[XÓA]</a>
     </div>
     </div>
 </div>

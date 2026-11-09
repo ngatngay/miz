@@ -30,7 +30,7 @@ require SITE_HEADER;
 
     <form method="post" class="mt-3">
         <button type="submit" class="btn btn-danger">Xóa</button>
-        <a class="btn btn-outline-secondary" href="/domain_list.php">Hủy</a>
+        <a class="btn btn-outline-secondary" href="/domain-list.php">Hủy</a>
     </form>
 <?php } ?>
 

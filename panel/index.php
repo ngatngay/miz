@@ -1,3 +1,3 @@
 <?php
 
-require __DIR__ . '/domain_list.php';
+require __DIR__ . '/domain-list.php';

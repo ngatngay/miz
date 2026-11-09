@@ -159,11 +159,11 @@ sudo update-alternatives --set vi /usr/bin/nvim
 
 chmod +x /miz/bin/*
 
-chmod 700 /miz
-chown root:root /miz
+chmod 750 /miz
+chown miz-admin:miz-admin /miz
 
-chmod 711 /miz_data
-chown root:root /miz_data
+chmod 750 /miz_data
+chown miz-admin:miz-admin /miz_data
 
 # <<
 

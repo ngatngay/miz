@@ -44,7 +44,7 @@ $site_head = isset($site_head) ? $site_head : '';
   </div>
   <div class="offcanvas-body">
     <ul class="list-group">
-      <li class="list-group-item"><a href="/domain_list.php">domains</a></li>
+      <li class="list-group-item"><a href="/domain-list.php">domains</a></li>
 
       <li class="list-group-item"><a href="/file-manager/">file (www)</a></li>
       <li class="list-group-item"><a href="/file-manager-root/">file (root)</a></li>

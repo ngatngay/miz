@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -e
 
-INI_FILE="/miz_data/users_ftp.ini"
+INI_FILE="/miz-data/users_ftp.ini"
 VIRT_FILE="/etc/vsftpd/virt_users"
 VIRT_DB="/etc/vsftpd/virt_users.db"
 USER_CONF_DIR="/etc/vsftpd/user_conf"

@@ -21,15 +21,15 @@ echo
 
 # >> tạo thư mục cần thiết
 
-mkdir -p /miz_data
-mkdir -p /miz_data/app
-mkdir -p /miz_data/domains
+mkdir -p /miz-data
+mkdir -p /miz-data/app
+mkdir -p /miz-data/domains
 
-if [ ! -e /miz_data/settings.json ] && [ ! -d /miz_data/settings ]; then
-    printf '{}\n' > /miz_data/settings.json
+if [ ! -e /miz-data/settings.json ] && [ ! -d /miz-data/settings ]; then
+    printf '{}\n' > /miz-data/settings.json
 fi
 
-mkdir -p /var/log/apache2_stats
+mkdir -p /var/log/apache2-stats
 
 # <<
 
@@ -148,8 +148,8 @@ sudo update-alternatives --set vi /usr/bin/nvim
 /miz/bin/miz-download-bin php-cs-fixer https://static.nightmare.top/app/php-cs-fixer/php-cs-fixer
 /miz/bin/miz-download-bin wp https://static.nightmare.top/app/wp/wp
 
-/miz/bin/miz-download-file /miz_data/app/file-manager-php.zip https://static.nightmare.top/app/file-manager-php/release.zip
-/miz/bin/miz-download-file /miz_data/app/phpmyadmin.zip https://files.phpmyadmin.net/snapshots/phpMyAdmin-5.2+snapshot-english.zip
+/miz/bin/miz-download-file /miz-data/app/file-manager-php.zip https://static.nightmare.top/app/file-manager-php/release.zip
+/miz/bin/miz-download-file /miz-data/app/phpmyadmin.zip https://files.phpmyadmin.net/snapshots/phpMyAdmin-5.2+snapshot-english.zip
 
 # <<
 
@@ -161,8 +161,8 @@ chmod +x /miz/bin/*
 chmod 750 /miz
 chown miz-admin:miz-admin /miz
 
-chmod 750 /miz_data
-chown miz-admin:miz-admin /miz_data
+chmod 750 /miz-data
+chown miz-admin:miz-admin /miz-data
 
 # <<
 

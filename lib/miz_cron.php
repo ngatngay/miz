@@ -14,11 +14,11 @@ class miz_cron
 
     public static function get_all(): array
     {
-        if (!is_file('/miz_data/crontab.json')) {
+        if (!is_file('/miz-data/crontab.json')) {
             return [];
         }
 
-        $items = json_decode(file_get_contents('/miz_data/crontab.json'), true);
+        $items = json_decode(file_get_contents('/miz-data/crontab.json'), true);
 
         if (!is_array($items)) {
             return [];
@@ -34,7 +34,7 @@ class miz_cron
         });
 
         file_put_contents(
-            '/miz_data/crontab.json',
+            '/miz-data/crontab.json',
             json_encode($items, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)
         );
 
@@ -70,7 +70,7 @@ class miz_cron
 
     public static function deploy(): void
     {
-        if (!is_file('/miz_data/crontab.json')) {
+        if (!is_file('/miz-data/crontab.json')) {
             return;
         }
 

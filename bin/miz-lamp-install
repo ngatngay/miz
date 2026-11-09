@@ -7,8 +7,8 @@ source /miz/miz.sh
 # >> ADMIN PASSWD
 
 MIZ_LAMP_PWD=""
-if [ -s /miz_data/.pwd ]; then
-    MIZ_LAMP_PWD="$(cat /miz_data/.pwd)"
+if [ -s /miz-data/.pwd ]; then
+    MIZ_LAMP_PWD="$(cat /miz-data/.pwd)"
 fi
 
 if [ -z "$MIZ_LAMP_PWD" ]; then
@@ -64,25 +64,25 @@ echo "=== BẮT ĐẦU XỬ LÝ USER ==="
 mkdir -p "/home/www"
 chown "www:www" "/home/www"
 
-mkdir -p "/miz_data/app"
+mkdir -p "/miz-data/app"
 
-mkdir -p "/miz_data/app/file-manager"
-if [ ! -s "/miz_data/app/file-manager/index.php" ]; then
-    unzip -oq /miz_data/app/file-manager-php.zip -d "/miz_data/app/file-manager"
+mkdir -p "/miz-data/app/file-manager"
+if [ ! -s "/miz-data/app/file-manager/index.php" ]; then
+    unzip -oq /miz-data/app/file-manager-php.zip -d "/miz-data/app/file-manager"
 fi
 
-mkdir -p "/miz_data/app/phpmyadmin"
-if [ ! -s "/miz_data/app/phpmyadmin/index.php" ]; then
-    rm -rf "/miz_data/app/phpMyAdmin-"* "/miz_data/app/phpmyadmin"
-    unzip -oq /miz_data/app/phpmyadmin.zip -d "/miz_data/app"
-    mv "/miz_data/app/phpMyAdmin-"* "/miz_data/app/phpmyadmin"
-    cp /miz/tpl/phpmyadmin.config.php "/miz_data/app/phpmyadmin/config.inc.php"
+mkdir -p "/miz-data/app/phpmyadmin"
+if [ ! -s "/miz-data/app/phpmyadmin/index.php" ]; then
+    rm -rf "/miz-data/app/phpMyAdmin-"* "/miz-data/app/phpmyadmin"
+    unzip -oq /miz-data/app/phpmyadmin.zip -d "/miz-data/app"
+    mv "/miz-data/app/phpMyAdmin-"* "/miz-data/app/phpmyadmin"
+    cp /miz/tpl/phpmyadmin.config.php "/miz-data/app/phpmyadmin/config.inc.php"
 fi
 
-chmod 711 /miz_data/app
-chown root:root /miz_data/app
+chmod 711 /miz-data/app
+chown root:root /miz-data/app
 
-chown -R www:www /miz_data/app/*
+chown -R www:www /miz-data/app/*
 
 mkdir -p "/home/www/web"
 chown www:www "/home/www/web"
@@ -196,8 +196,8 @@ done
 # APACHE
 
 #create for panel
-htpasswd -bc /miz_data/.htpasswd admin "$MIZ_LAMP_PWD"
-chmod 644 /miz_data/.htpasswd
+htpasswd -bc /miz-data/.htpasswd admin "$MIZ_LAMP_PWD"
+chmod 644 /miz-data/.htpasswd
 
 
 # service

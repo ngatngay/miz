@@ -107,7 +107,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 $site_title = $is_edit_mode ? 'Cập nhật domain' : 'Thêm domain';
 $current_storage_id = $id !== '' ? $id : miz_domain::parse_id((string) ($forms['domains'] ?? ''));
-$conf_path = '/miz_data/domains/' . $current_storage_id . '/tmp';
+$conf_path = '/miz-data/domains/' . $current_storage_id . '/tmp';
 
 require SITE_HEADER;
 

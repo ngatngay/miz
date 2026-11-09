@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-PWD_FILE=/miz_data/.pwd
+PWD_FILE=/miz-data/.pwd
 
 OLD_PWD=""
 if [ -e "$PWD_FILE" ]; then

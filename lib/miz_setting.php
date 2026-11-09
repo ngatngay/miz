@@ -12,7 +12,7 @@ class miz_setting
     public static function save(array $data): void
     {
         file_put_contents(
-            '/miz_data/settings.json',
+            '/miz-data/settings.json',
             json_encode($data, JSON_PRETTY_PRINT)
         );
     }
@@ -36,9 +36,9 @@ class miz_setting
     {
         $data = [];
 
-        if (is_file('/miz_data/settings.json')) {
+        if (is_file('/miz-data/settings.json')) {
             $data = json_decode(
-                file_get_contents('/miz_data/settings.json'),
+                file_get_contents('/miz-data/settings.json'),
                 true
             );
         }

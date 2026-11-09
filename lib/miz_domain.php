@@ -33,7 +33,7 @@ class miz_domain
 
     public static function get($key)
     {
-        $file = "/miz_data/domains/$key/data.json";
+        $file = "/miz-data/domains/$key/data.json";
         $data = [];
 
         if (is_file($file)) {
@@ -45,7 +45,7 @@ class miz_domain
 
     public static function save(string $key, array $data): void
     {
-        $dir = "/miz_data/domains/$key";
+        $dir = "/miz-data/domains/$key";
 
         miz::mkdir($dir);
 
@@ -74,7 +74,7 @@ class miz_domain
     {
         $domains = [];
 
-        foreach (glob('/miz_data/domains/*/data.json') as $file) {
+        foreach (glob('/miz-data/domains/*/data.json') as $file) {
             $id = basename(dirname($file));
             $domains[$id] = self::get($id);
         }
@@ -107,7 +107,7 @@ class miz_domain
             return;
         }
 
-        $path = '/miz_data/domains/' . $id;
+        $path = '/miz-data/domains/' . $id;
         passthru('rm -rf ' . escapeshellarg($path));
     }
 }

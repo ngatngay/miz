@@ -118,7 +118,7 @@ try {
 
     }
 
-    $cert_dir = '/miz_data/certs_self';
+    $cert_dir = '/miz-data/certs-self';
     if (!is_dir($cert_dir) && !mkdir($cert_dir, 0755, true) && !is_dir($cert_dir)) {
         throw new Exception("Khong tao duoc thu muc cert: {$cert_dir}");
     }

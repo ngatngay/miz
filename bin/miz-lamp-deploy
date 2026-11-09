@@ -36,7 +36,7 @@ foreach ($domains as $domain_id => $domain) {
 
     $domain['apache_xsendfile_dir'] = $domain['dir'];
 
-    $domain['domain_tmp_path'] = '/miz_data/domains/' . trim($domain_id) . '/tmp';
+    $domain['domain_tmp_path'] = '/miz-data/domains/' . trim($domain_id) . '/tmp';
 
     passthru('rm -rf ' . escapeshellarg($domain['domain_tmp_path']));
     passthru('mkdir -p ' . escapeshellarg($domain['domain_tmp_path']));

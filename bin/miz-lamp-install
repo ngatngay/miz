@@ -58,8 +58,6 @@ echo
 echo '>>'
 echo
 
-mkdir -p /miz_data/panel
-
 #user
 echo "=== BẮT ĐẦU XỬ LÝ USER ==="
 
@@ -94,10 +92,6 @@ chmod 750 /home/www
 
 echo "=== HOÀN TẤT ==="
 # user
-
-chown root:www-data -R /miz_data/panel
-chmod 750 /miz_data/panel
-cp -r /miz/panel/. /miz_data/panel/
 
 # auto ssl
 sudo cat > /etc/systemd/system/miz-lamp-auto-ssl.service <<'EOF'

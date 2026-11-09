@@ -24,7 +24,6 @@ echo
 mkdir -p /miz_data
 mkdir -p /miz_data/app
 mkdir -p /miz_data/domains
-mkdir -p /miz_data/panel
 
 if [ ! -e /miz_data/settings.json ] && [ ! -d /miz_data/settings ]; then
     printf '{}\n' > /miz_data/settings.json

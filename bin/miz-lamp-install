@@ -94,9 +94,9 @@ echo "=== HOÀN TẤT ==="
 # user
 
 # auto ssl
-sudo cat > /etc/systemd/system/miz-lamp-auto-ssl.service <<'EOF'
+sudo cat > /etc/systemd/system/miz-lamp-queue.service <<'EOF'
 [Unit]
-Description=MIZ LAMP Auto SSL
+Description=MIZ LAMP Queue
 After=network.target apache2.service haproxy.service
 Requires=apache2.service haproxy.service
 
@@ -108,7 +108,7 @@ TimeoutStopSec=0
 
 ExecStartPre=/bin/sleep 999
 Environment=MIZ_SYSTEMD_AUTO_SSL=1
-ExecStart=/miz/bin/miz-lamp-renew-ssl
+ExecStart=/miz/bin/miz-lamp-queue
 
 Restart=always
 RestartSec=86400
@@ -124,11 +124,11 @@ WantedBy=multi-user.target
 EOF
 
 sudo systemctl daemon-reload
-sudo systemctl enable miz-lamp-auto-ssl
-sudo systemctl restart miz-lamp-auto-ssl &
+sudo systemctl enable miz-lamp-queue
+sudo systemctl restart miz-lamp-queue &
 
 # php admin
-sudo cat > /etc/systemd/system/miz-php-fpm-admin.service <<'EOF'
+sudo cat > /etc/systemd/system/miz-admin-php-fpm.service <<'EOF'
 [Unit]
 Description=PHP-FPM Admin
 After=network.target
@@ -150,8 +150,8 @@ WantedBy=multi-user.target
 EOF
 
 sudo systemctl daemon-reload
-sudo systemctl enable miz-php-fpm-admin
-sudo systemctl restart miz-php-fpm-admin
+sudo systemctl enable miz-admin-php-fpm
+sudo systemctl restart miz-admin-php-fpm
 
 
 # ========

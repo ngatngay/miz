@@ -9,5 +9,5 @@ done
 
 certbot renew -n -q
 
-php /miz/bin/miz_lamp_commit_ssl.sh
+php /miz/bin/miz_lamp_commit_ssl
 systemctl reload haproxy

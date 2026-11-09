@@ -1,10 +1,15 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# >> Kiểm tra hệ thống
+
 if [ "$(. /etc/os-release && echo "$ID-$VERSION_ID")" != "ubuntu-26.04" ]; then
     echo "Require Ubuntu 26.04 LTS" >&2
     exit 1
 fi
+
+# <<
+
 
 # >> thông báo bắt đầu
 
@@ -48,15 +53,34 @@ pip install ps_mem --break-system-packages
 # <<
 
 
+# >> tạo user
+
+if id www &>/dev/null; then
+    usermod -s /usr/bin/fish www
+else
+    useradd -m -s /usr/bin/fish www
+fi
+
+if id miz-admin &>/dev/null; then
+    usermod -s /usr/sbin/nologin miz-admin
+else
+    useradd -M -s /usr/sbin/nologin miz-admin
+fi
+
+usermod -aG www,miz-admin www-data
+
+# <<
+
+
 # >> tải công cụ tiện ích hỗ trợ
 
-/miz/bin/miz_download_bin.sh composer https://static.nightmare.top/app/composer/composer
-/miz/bin/miz_download_bin.sh phpstan https://static.nightmare.top/app/phpstan/phpstan
-/miz/bin/miz_download_bin.sh php-cs-fixer https://static.nightmare.top/app/php-cs-fixer/php-cs-fixer
-/miz/bin/miz_download_bin.sh wp https://static.nightmare.top/app/wp/wp
+/miz/bin/miz_download_bin composer https://static.nightmare.top/app/composer/composer
+/miz/bin/miz_download_bin phpstan https://static.nightmare.top/app/phpstan/phpstan
+/miz/bin/miz_download_bin php-cs-fixer https://static.nightmare.top/app/php-cs-fixer/php-cs-fixer
+/miz/bin/miz_download_bin wp https://static.nightmare.top/app/wp/wp
 
-/miz/bin/miz_download_file.sh /miz_data/app/file-manager-php.zip https://static.nightmare.top/app/file-manager-php/release.zip
-/miz/bin/miz_download_file.sh /miz_data/app/phpmyadmin.zip https://files.phpmyadmin.net/snapshots/phpMyAdmin-5.2+snapshot-english.zip
+/miz/bin/miz_download_file /miz_data/app/file-manager-php.zip https://static.nightmare.top/app/file-manager-php/release.zip
+/miz/bin/miz_download_file /miz_data/app/phpmyadmin.zip https://files.phpmyadmin.net/snapshots/phpMyAdmin-5.2+snapshot-english.zip
 
 # <<
 
@@ -97,7 +121,7 @@ Wants=network-online.target
 
 [Service]
 Type=simple
-ExecStart=/miz/bin/miz_startup.sh
+ExecStart=/miz/bin/miz_startup
 
 TimeoutStartSec=0
 TimeoutStopSec=0

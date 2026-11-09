@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
 # ==============================
-# File: miz_ip_unban.sh
-# Usage: ./miz_ip_unban.sh <IP_ADDRESS>
+# File: miz_ip_unban
+# Usage: ./miz_ip_unban <IP_ADDRESS>
 # ==============================
 
 IP_ADDRESS="$1"

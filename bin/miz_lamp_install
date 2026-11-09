@@ -53,7 +53,7 @@ echo "config-ing..."
 
 # ========
 
-bash /miz/bin/miz_php_set_default_version.sh 8.3
+bash /miz/bin/miz_php_set_default_version 8.3
 echo
 echo '>>'
 echo
@@ -124,7 +124,7 @@ TimeoutStopSec=0
 
 ExecStartPre=/bin/sleep 999
 Environment=MIZ_SYSTEMD_AUTO_SSL=1
-ExecStart=/miz/bin/miz_lamp_renew_ssl.sh
+ExecStart=/miz/bin/miz_lamp_renew_ssl
 
 Restart=always
 RestartSec=86400

@@ -71,19 +71,6 @@ usermod -aG www,miz-admin www-data
 # <<
 
 
-# >> tải công cụ tiện ích hỗ trợ
-
-/miz/bin/miz-download-bin composer https://static.nightmare.top/app/composer/composer
-/miz/bin/miz-download-bin phpstan https://static.nightmare.top/app/phpstan/phpstan
-/miz/bin/miz-download-bin php-cs-fixer https://static.nightmare.top/app/php-cs-fixer/php-cs-fixer
-/miz/bin/miz-download-bin wp https://static.nightmare.top/app/wp/wp
-
-/miz/bin/miz-download-file /miz_data/app/file-manager-php.zip https://static.nightmare.top/app/file-manager-php/release.zip
-/miz/bin/miz-download-file /miz_data/app/phpmyadmin.zip https://files.phpmyadmin.net/snapshots/phpMyAdmin-5.2+snapshot-english.zip
-
-# <<
-
-
 # >> tối ưu kernel
 
 cp -f /miz/tpl/sysctl.conf /etc/sysctl.d/99-zzz.conf
@@ -150,6 +137,19 @@ chsh -s /usr/bin/fish root
 
 sudo update-alternatives --install /usr/bin/vi vi /usr/bin/nvim 60
 sudo update-alternatives --set vi /usr/bin/nvim
+
+# <<
+
+
+# >> tải công cụ tiện ích hỗ trợ
+
+/miz/bin/miz-download-bin composer https://static.nightmare.top/app/composer/composer
+/miz/bin/miz-download-bin phpstan https://static.nightmare.top/app/phpstan/phpstan
+/miz/bin/miz-download-bin php-cs-fixer https://static.nightmare.top/app/php-cs-fixer/php-cs-fixer
+/miz/bin/miz-download-bin wp https://static.nightmare.top/app/wp/wp
+
+/miz/bin/miz-download-file /miz_data/app/file-manager-php.zip https://static.nightmare.top/app/file-manager-php/release.zip
+/miz/bin/miz-download-file /miz_data/app/phpmyadmin.zip https://files.phpmyadmin.net/snapshots/phpMyAdmin-5.2+snapshot-english.zip
 
 # <<
 

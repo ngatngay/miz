@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if ! command -v whois >/dev/null 2>&1; then
+    apt-get install --no-upgrade --yes whois >/dev/null
+fi
+
+ip="$(/miz/bin/miz-get-server-ip)"
+
+if [ -z "$ip" ]; then
+    echo 'UNKNOWN'
+    exit 0
+fi
+
+country="$(whois "$ip" 2>/dev/null | awk 'tolower($1) == "country:" { print $2; exit }')" || true
+
+printf '%s\n' "${country:-UNKNOWN}"

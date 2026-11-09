@@ -127,7 +127,7 @@ require SITE_HEADER;
 <div class="alert alert-success">
     <div><?= e($success_act === 'add' ? 'Thêm domain thành công.' : 'Cập nhật domain thành công.') ?></div>
 
-    <br><a href="/cmd.php?cmd=/miz/bin/miz_lamp_deploy" class="btn btn-success">CẬP NHẬT CÀI ĐẶT</a>
+    <br><a href="/cmd.php?cmd=/miz/bin/miz-lamp-deploy" class="btn btn-success">CẬP NHẬT CÀI ĐẶT</a>
 </div>
 <?php } ?>
 

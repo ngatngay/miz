@@ -3,7 +3,7 @@
 ip_addr="$(ip route get to 8.8.8.8 2> /dev/null | grep -m 1 -o 'src [0-9.]*' | cut -d ' ' -f 2)"
 
 if [ -z "$ip_addr" ]; then
-    ip_addr=$(_trim "$(curl "https://checkip.amazonaws.com")")
+    ip_addr="$(curl -fsS --max-time 10 https://checkip.amazonaws.com | tr -d '[:space:]')"
 fi
 
 echo "$ip_addr"

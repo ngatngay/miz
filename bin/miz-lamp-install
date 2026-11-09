@@ -53,7 +53,7 @@ echo "config-ing..."
 
 # ========
 
-bash /miz/bin/miz_php_set_default_version 8.3
+bash /miz/bin/miz-php-set-default-version 8.3
 echo
 echo '>>'
 echo
@@ -110,7 +110,7 @@ chmod 750 /miz_data/panel
 cp -r /miz/panel/. /miz_data/panel/
 
 # auto ssl
-sudo cat > /etc/systemd/system/miz_lamp_auto_ssl.service <<'EOF'
+sudo cat > /etc/systemd/system/miz-lamp-auto-ssl.service <<'EOF'
 [Unit]
 Description=MIZ LAMP Auto SSL
 After=network.target apache2.service haproxy.service
@@ -124,7 +124,7 @@ TimeoutStopSec=0
 
 ExecStartPre=/bin/sleep 999
 Environment=MIZ_SYSTEMD_AUTO_SSL=1
-ExecStart=/miz/bin/miz_lamp_renew_ssl
+ExecStart=/miz/bin/miz-lamp-renew-ssl
 
 Restart=always
 RestartSec=86400
@@ -140,11 +140,11 @@ WantedBy=multi-user.target
 EOF
 
 sudo systemctl daemon-reload
-sudo systemctl enable miz_lamp_auto_ssl
-sudo systemctl restart miz_lamp_auto_ssl &
+sudo systemctl enable miz-lamp-auto-ssl
+sudo systemctl restart miz-lamp-auto-ssl &
 
 # php admin
-sudo cat > /etc/systemd/system/miz_php_fpm_admin.service <<'EOF'
+sudo cat > /etc/systemd/system/miz-php-fpm-admin.service <<'EOF'
 [Unit]
 Description=PHP-FPM Admin
 After=network.target
@@ -166,8 +166,8 @@ WantedBy=multi-user.target
 EOF
 
 sudo systemctl daemon-reload
-sudo systemctl enable miz_php_fpm_admin
-sudo systemctl restart miz_php_fpm_admin
+sudo systemctl enable miz-php-fpm-admin
+sudo systemctl restart miz-php-fpm-admin
 
 
 # ========
@@ -239,7 +239,7 @@ a2ensite '*' >/dev/null
 apachectl configtest && systemctl restart apache2
 
 # cron
-miz_cron_add miz_lamp_gen_stats
+miz_cron_add miz-lamp-gen-stats
 
 
 # ========

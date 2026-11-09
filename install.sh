@@ -74,13 +74,13 @@ usermod -aG www,miz-admin www-data
 
 # >> tải công cụ tiện ích hỗ trợ
 
-/miz/bin/miz_download_bin composer https://static.nightmare.top/app/composer/composer
-/miz/bin/miz_download_bin phpstan https://static.nightmare.top/app/phpstan/phpstan
-/miz/bin/miz_download_bin php-cs-fixer https://static.nightmare.top/app/php-cs-fixer/php-cs-fixer
-/miz/bin/miz_download_bin wp https://static.nightmare.top/app/wp/wp
+/miz/bin/miz-download-bin composer https://static.nightmare.top/app/composer/composer
+/miz/bin/miz-download-bin phpstan https://static.nightmare.top/app/phpstan/phpstan
+/miz/bin/miz-download-bin php-cs-fixer https://static.nightmare.top/app/php-cs-fixer/php-cs-fixer
+/miz/bin/miz-download-bin wp https://static.nightmare.top/app/wp/wp
 
-/miz/bin/miz_download_file /miz_data/app/file-manager-php.zip https://static.nightmare.top/app/file-manager-php/release.zip
-/miz/bin/miz_download_file /miz_data/app/phpmyadmin.zip https://files.phpmyadmin.net/snapshots/phpMyAdmin-5.2+snapshot-english.zip
+/miz/bin/miz-download-file /miz_data/app/file-manager-php.zip https://static.nightmare.top/app/file-manager-php/release.zip
+/miz/bin/miz-download-file /miz_data/app/phpmyadmin.zip https://files.phpmyadmin.net/snapshots/phpMyAdmin-5.2+snapshot-english.zip
 
 # <<
 
@@ -113,7 +113,7 @@ systemctl restart systemd-journald
 
 # >> cài đặt auto startup chạy 1 lần
 
-cat << 'EOF' > /etc/systemd/system/miz_startup.service
+cat << 'EOF' > /etc/systemd/system/miz-startup.service
 [Unit]
 Description=miz startup
 After=multi-user.target network-online.target
@@ -121,7 +121,7 @@ Wants=network-online.target
 
 [Service]
 Type=simple
-ExecStart=/miz/bin/miz_startup
+ExecStart=/miz/bin/miz-startup
 
 TimeoutStartSec=0
 TimeoutStopSec=0
@@ -140,7 +140,7 @@ WantedBy=multi-user.target
 EOF
 
 systemctl daemon-reload
-systemctl enable miz_startup.service
+systemctl enable miz-startup.service
 
 # <<
 

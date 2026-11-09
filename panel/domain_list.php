@@ -22,7 +22,7 @@ $domains = miz_domain::get_all();
 
 <div class="mb-3">
     <a class="btn btn-sm btn-primary" href="/domain_edit.php">Thêm domain</a>
-    <a href="/cmd.php?cmd=/miz/bin/miz_lamp_deploy" class="btn btn-sm btn-success">CẬP NHẬT CÀI ĐẶT</a>
+    <a href="/cmd.php?cmd=/miz/bin/miz-lamp-deploy" class="btn btn-sm btn-success">CẬP NHẬT CÀI ĐẶT</a>
 </div>
 
 <?php foreach ($domains as $domain_id => $domain_config) {

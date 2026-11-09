@@ -174,4 +174,4 @@ OLD_MOVED=0
 
 printf 'migration completed\n'
 printf 'backup: %s\n' "$BACKUP"
-printf 'deploy manually: /miz/bin/miz_lamp_deploy\n'
+printf 'deploy manually: /miz/bin/miz-lamp-deploy\n'

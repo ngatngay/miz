@@ -1,5 +1,0 @@
-#!/usr/bin/env bash
-set -euo pipefail
-
-# Placeholder cho các tác vụ startup sau này.
-exit 0

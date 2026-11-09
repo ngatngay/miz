@@ -97,40 +97,6 @@ systemctl restart systemd-journald
 # <<
 
 
-# >> cài đặt auto startup chạy 1 lần
-
-cat << 'EOF' > /etc/systemd/system/miz-startup.service
-[Unit]
-Description=miz startup
-After=multi-user.target network-online.target
-Wants=network-online.target
-
-[Service]
-Type=simple
-ExecStart=/miz/bin/miz-startup
-
-TimeoutStartSec=0
-TimeoutStopSec=0
-KillSignal=SIGTERM
-KillMode=process
-SendSIGKILL=no
-Restart=no
-RemainAfterExit=no
-OOMScoreAdjust=-1000
-
-StandardOutput=null
-StandardError=null
-
-[Install]
-WantedBy=multi-user.target
-EOF
-
-systemctl daemon-reload
-systemctl enable miz-startup.service
-
-# <<
-
-
 # >> cấu hình shell
 cp -r /miz/tpl/fish/* /etc/fish/
 chsh -s /usr/bin/fish root

@@ -30,7 +30,7 @@ done
 
 echo "$new_pwd" > "$PWD_FILE"
 chmod 600 "$PWD_FILE"
-chown root:root "$PWD_FILE"
+chown miz-admin:miz-admin "$PWD_FILE"
 
 if ! chattr +i "$PWD_FILE" 2>/dev/null; then
     echo "[!] Canh bao: khong the dat immutable cho $PWD_FILE" >&2

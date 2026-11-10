@@ -81,9 +81,7 @@ sysctl --system
 # >> bảo mật hệ thống
 
 (
-    cp -r /miz/tpl/fail2ban.action/* /etc/fail2ban/action.d/
-    cp -r /miz/tpl/fail2ban.filter/* /etc/fail2ban/filter.d/
-    cp -f /miz/tpl/fail2ban.conf /etc/fail2ban/jail.local
+    cp -r /miz/tpl/fail2ban/. /etc/fail2ban/
     systemctl restart fail2ban
 )
 

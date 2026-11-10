@@ -94,9 +94,9 @@ echo "=== HOÀN TẤT ==="
 # user
 
 # auto ssl
-sudo cat > /etc/systemd/system/miz-lamp-queue.service <<'EOF'
+sudo cat > /etc/systemd/system/miz-admin-queue.service <<'EOF'
 [Unit]
-Description=MIZ LAMP Queue
+Description=MIZ Admin Queue
 After=network.target apache2.service haproxy.service
 Requires=apache2.service haproxy.service
 
@@ -124,8 +124,8 @@ WantedBy=multi-user.target
 EOF
 
 sudo systemctl daemon-reload
-sudo systemctl enable miz-lamp-queue
-sudo systemctl restart miz-lamp-queue &
+sudo systemctl enable miz-admin-queue
+sudo systemctl restart miz-admin-queue &
 
 # php admin
 sudo cat > /etc/systemd/system/miz-admin-php-fpm.service <<'EOF'

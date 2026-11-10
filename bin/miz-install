@@ -108,7 +108,7 @@ TimeoutStopSec=0
 
 ExecStartPre=/bin/sleep 999
 Environment=MIZ_SYSTEMD_AUTO_SSL=1
-ExecStart=/miz/bin/miz-lamp-queue
+ExecStart=/miz/bin/miz-queue
 
 Restart=always
 RestartSec=86400

@@ -86,7 +86,7 @@ if (true) {
     }
     // GET END
 
-    passthru('/miz/bin/miz-lamp-commit-ssl');
+    passthru('/miz/bin/miz-commit-ssl');
 }
 
 

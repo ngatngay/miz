@@ -31,15 +31,19 @@ $modes = [
     'proxy'
 ];
 
+$php_defaults = '8.3';
 $php_versions = [
     '0' => 'Tắt',
-    '8.3' => 'PHP 8.3',
 ];
+
+foreach (miz_php::list_fpm() as $version) {
+    $php_versions[$version] = 'PHP ' . $version;
+}
 
 $editing_data = $editing_domain;
 $forms = array_replace(miz_domain::config_tpl(), $domain, $_POST);
 $forms['domains'] = preg_replace('/\s+/', ' ', $forms['domains']);
-$forms['mode_php'] = $forms['mode_php'] ?: '8.3';
+$forms['mode_php'] = $forms['mode_php'] ?: $php_defaults;
 $forms['dir'] = trim($forms['dir'], '/');
 $forms['dir_run'] = trim($forms['dir_run'], '/');
 
@@ -50,10 +54,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $domain_names = miz_domain::parse_domains($forms['domains']);
     if (empty($domain_names)) {
         $errors[] = 'Vui lòng nhập ít nhất một domain.';
-    }
-
-    if (!array_key_exists($forms['mode_php'], $php_versions)) {
-        $errors[] = 'Phiên bản PHP không hợp lệ.';
     }
 
     if (!preg_match('/^[a-zA-Z0-9.* -]+$/', $forms['domains'])) {

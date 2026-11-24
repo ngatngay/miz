@@ -150,7 +150,7 @@ if (true) {
     }
 
     // reload all
-    $versions = ['8.3'];
+    $versions = miz_php::list_fpm();
 
     foreach ($versions as $v) {
         $php_fpm_cmd = 'php-fpm' . $v;

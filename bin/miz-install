@@ -34,7 +34,7 @@ add-apt-repository -n -y ppa:vbernat/haproxy-3.2
 
 apt-get update --yes
 apt-get install --yes --no-upgrade haproxy apache2 libapache2-mod-xsendfile ssl-cert wrk goaccess \
-    $(miz_php_install 5.6 7.4 8.0 8.1 8.2 8.3 8.4 8.5) \
+    $(/miz/bin/miz-php-install 8.3) \
     mariadb-server \
     vsftpd
 

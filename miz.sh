@@ -26,37 +26,3 @@ miz_php_list() {
         fi
     fi
 }
-
-miz_php_install() {
-    if [[ $# -eq 0 ]]; then
-        echo "Usage: miz_php_install <php_version> [more_versions...]"
-        return 1
-    fi
-
-    local all_packages=()
-
-    for version in "$@"; do
-        all_packages+=(
-            "php${version}"
-            "php${version}-bcmath"
-            "php${version}-memcached"
-            "php${version}-redis"
-            "php${version}-cli"
-            "php${version}-curl"
-            "php${version}-fpm"
-            "php${version}-intl"
-            "php${version}-imagick"
-            "php${version}-imap"
-            "php${version}-gd"
-            "php${version}-mbstring"
-            "php${version}-mcrypt"
-            "php${version}-mysql"
-            "php${version}-sqlite3"
-            "php${version}-xml"
-            "php${version}-xmlrpc"
-            "php${version}-zip"
-        )
-    done
-
-    echo "${all_packages[@]}"
-}

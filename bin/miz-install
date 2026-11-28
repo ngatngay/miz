@@ -30,7 +30,7 @@ dpkg -i /tmp/debsuryorg-archive-keyring.deb
 sh -c 'echo "deb [signed-by=/usr/share/keyrings/debsuryorg-archive-keyring.gpg] https://packages.sury.org/php/ $(lsb_release -sc) main" > /etc/apt/sources.list.d/php.list'
 #php_end
 
-add-apt-repository -n -y ppa:vbernat/haproxy-3.2
+# add-apt-repository -n -y ppa:vbernat/haproxy-3.2
 
 apt-get update --yes
 apt-get install --yes --no-upgrade haproxy apache2 libapache2-mod-xsendfile ssl-cert wrk goaccess \

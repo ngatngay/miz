@@ -3,8 +3,8 @@ set -euo pipefail
 
 # >> Kiểm tra hệ thống
 
-if [ "$(. /etc/os-release && echo "$ID-$VERSION_ID")" != "ubuntu-24.04" ]; then
-    echo "Require Ubuntu 24.04 LTS" >&2
+if [ "$(. /etc/os-release && echo "$ID-$VERSION_ID")" != "ubuntu-26.04" ]; then
+    echo "Require Ubuntu 26.04 LTS" >&2
     exit 1
 fi
 
